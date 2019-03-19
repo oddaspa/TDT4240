@@ -2,4 +2,4 @@
 Project in Program Architecture
 
 ## Prototype
-<img src="./assets/Prototype.png"  width="500" height="300">  
+<img src="./assets/battlesheep_prototype.png"  width="600" height="800">  
