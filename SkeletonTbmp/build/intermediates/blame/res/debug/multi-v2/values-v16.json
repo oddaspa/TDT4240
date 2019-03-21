@@ -1,0 +1,57 @@
+{
+    "logs": [
+        {
+            "outputFile": "/Users/andreasmelzer/Desktop/android-basic-samples-master/SkeletonTbmp/build/intermediates/incremental/mergeDebugResources/merged.dir/values-v16/values-v16.xml",
+            "map": [
+                {
+                    "source": "/Users/andreasmelzer/.gradle/caches/transforms-1/files-1.1/appcompat-v7-27.0.2.aar/82614d62a2d09517902675db5a40753a/res/values-v16/values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "5",
+                        "endColumns": "12",
+                        "endOffsets": "223"
+                    },
+                    "to": {
+                        "startLines": "36",
+                        "startColumns": "4",
+                        "startOffsets": "1794",
+                        "endLines": "39",
+                        "endColumns": "12",
+                        "endOffsets": "1962"
+                    }
+                },
+                {
+                    "source": "/Users/andreasmelzer/.gradle/caches/transforms-1/files-1.1/support-compat-27.0.2.aar/5cf5f313c6ca6ced385137b81494d81a/res/values-v16/values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "65",
+                        "endOffsets": "116"
+                    }
+                },
+                {
+                    "source": "/Users/andreasmelzer/Desktop/android-basic-samples-master/SkeletonTbmp/src/main/res/values-v16/styles.xml",
+                    "from": {
+                        "startLines": "25,2,6,10,19,16",
+                        "startColumns": "4,4,4,4,4,4",
+                        "startOffsets": "1194,55,252,450,896,749",
+                        "endLines": "34,5,9,15,24,18",
+                        "endColumns": "12,12,12,12,12,12",
+                        "endOffsets": "1723,247,445,744,1189,891"
+                    },
+                    "to": {
+                        "startLines": "3,13,17,21,27,33",
+                        "startColumns": "4,4,4,4,4,4",
+                        "startOffsets": "121,655,852,1050,1349,1647",
+                        "endLines": "12,16,20,26,32,35",
+                        "endColumns": "12,12,12,12,12,12",
+                        "endOffsets": "650,847,1045,1344,1642,1789"
+                    }
+                }
+            ]
+        }
+    ]
+}
