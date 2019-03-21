@@ -9,12 +9,13 @@ import g11.mygdx.game.BattleSheep;
 public class MenuState extends State{
     private Texture background;
     private Texture playBtn;
+    private Texture challengeBtn;
 
     public MenuState(GameStateManager gsm) {
         super(gsm);
-        background = new Texture("background.jpg");
-        playBtn = new Texture("StartButton.png");
-
+        background = new Texture("background2.jpg");
+        playBtn = new Texture("quick_game.png");
+        challengeBtn = new Texture("challenge_friend.png");
     }
 
     @Override
@@ -35,7 +36,8 @@ public class MenuState extends State{
     public void render(SpriteBatch sb) {
         sb.begin();
         sb.draw(background,0,0,BattleSheep.WIDTH,BattleSheep.HEIGHT);
-        sb.draw(playBtn,(BattleSheep.WIDTH / 2) - (playBtn.getWidth() / 2),(BattleSheep.HEIGHT / 2));
+        sb.draw(playBtn,(BattleSheep.WIDTH / 2) - (playBtn.getWidth() / 2),(BattleSheep.HEIGHT *2 / 7));
+        sb.draw(challengeBtn,(BattleSheep.WIDTH / 2) - (playBtn.getWidth() / 2),(BattleSheep.HEIGHT / 14));
         sb.end();
 
     }
