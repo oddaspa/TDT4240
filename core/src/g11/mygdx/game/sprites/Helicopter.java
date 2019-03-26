@@ -43,7 +43,6 @@ public class Helicopter extends Sprite implements AssetModel{
     }
 
     public void update(float dt){
-        System.out.println("update to helicopter");
         heliAnimation.update(dt);
         if(position.y > BattleSheep.HEIGHT - 65){
             position.y = BattleSheep.HEIGHT - 65;

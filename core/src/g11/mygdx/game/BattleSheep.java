@@ -22,13 +22,12 @@ public class BattleSheep extends ApplicationAdapter {
 			System.out.println("Loading assets.. " + MyAssetManager.manager.getProgress() * 100 + "%");
 		}
 		batch = new SpriteBatch();
-		Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
+		Gdx.gl.glClearColor(194/255f, 225/255f, 157/255f, 1);
 		delta = Gdx.graphics.getDeltaTime();
 		model = new Model();
 		view = new View(batch);
 		controller = new Controller(view, model);
 		view.addObserver(controller);
-
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package g11.mygdx.game.states;
+package g11.mygdx.game;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -21,6 +21,6 @@ public abstract class Screen {
 
     protected  abstract void handleInput();
     public abstract void update(float dt);
-    public abstract void render(Array<Sprite> sprites);
+    public abstract void render(Array<Sprite> sprites, Array<String> messages);
     public abstract void dispose();
 }

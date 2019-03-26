@@ -4,12 +4,12 @@ package g11.mygdx.game;
 
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-
-import g11.mygdx.game.states.Screen;
 
 public class View extends Screen {
     float gx;
@@ -34,11 +34,10 @@ public class View extends Screen {
 
     public void handleInput() {
         if (Gdx.input.justTouched()) {
-            System.out.println("View got input");
             Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             gx = touchPos.x;
             gy = BattleSheep.HEIGHT - touchPos.y;
-            System.out.println("(X: " + gx + ", " + gy + ").");
+            System.out.println("(X: " + gx + ", Y:" + gy + ")");
         }
         float[] coordinates = new float[2];
         coordinates[0] = gx;
@@ -52,11 +51,21 @@ public class View extends Screen {
     }
 
     @Override
-    public void render(Array<Sprite> sprites) {
+    public void render(Array<Sprite> sprites, Array<String> msgs) {
         sb.begin();
         for (Sprite s : sprites) {
             sb.draw(s.getTexture(), Math.round(s.getX()),Math.round(s.getY()), s.getWidth(), s.getHeight());
         }
+        BitmapFont font = new BitmapFont();
+        font.getData().setScale(2);
+        font.setColor(Color.BLACK);
+        if(msgs != null){
+            font.draw(sb, msgs.get(0),BattleSheep.WIDTH/6, 720);
+            font.draw(sb, msgs.get(1),BattleSheep.WIDTH/10, 775);
+            font.draw(sb, msgs.get(2),BattleSheep.WIDTH/3, 50);
+        }
+
+
         sb.end();
     }
 
