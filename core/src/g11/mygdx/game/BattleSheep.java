@@ -22,7 +22,6 @@ public class BattleSheep extends ApplicationAdapter {
 			System.out.println("Loading assets.. " + MyAssetManager.manager.getProgress() * 100 + "%");
 		}
 		batch = new SpriteBatch();
-		//gsm = new GameStateManager();
 		Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
 		delta = Gdx.graphics.getDeltaTime();
 		model = new Model();
@@ -36,7 +35,6 @@ public class BattleSheep extends ApplicationAdapter {
 	public void render () {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		view.update(delta);
-		//view.render(model.serveMenuSprites());
 	}
 
 }

@@ -68,21 +68,24 @@ public class Model {
 
     // NB TextureAtlas might solve a lot of problems
     private void loadAllSprites(){
-        Texture bg = new Texture("background.jpg");
-        Texture sB = new Texture("StartButton.png");
+        Texture bg = new Texture("background2.jpg");
+        Texture playBtn = new Texture("quick_game.png");
+        Texture challengeBtn = new Texture("challenge_friend.png");
         Texture heliText = new Texture("heli13.png");
         Texture droneText = new Texture("droneCycle.png");
         Helicopter heli = new Helicopter(heliText);
         Drone drone = new Drone(200, droneText);
         Sprite background = new Sprite(bg, 0,0, BattleSheep.WIDTH, BattleSheep.HEIGHT);
-        Sprite startButton = new Sprite(sB, (BattleSheep.WIDTH / 2) - (sB.getWidth() / 2), BattleSheep.HEIGHT / 2, sB.getWidth(),sB.getHeight());
-
+        Sprite startButton = new Sprite(playBtn);
+        Sprite challengeButton = new Sprite(challengeBtn);
         // Had to use set position for some reason..
-        startButton.setPosition((BattleSheep.WIDTH / 2) - (sB.getWidth() / 2), BattleSheep.HEIGHT / 2);
+        startButton.setPosition((BattleSheep.WIDTH / 2) - (playBtn.getWidth() / 2),(BattleSheep.HEIGHT *2 / 7));
+        challengeButton.setPosition((BattleSheep.WIDTH / 2) - (playBtn.getWidth() / 2),(BattleSheep.HEIGHT / 14));
         this.playSprites.add(heli);
         this.playSprites.add(drone);
         this.menuSprites.add(background);
         this.menuSprites.add(startButton);
+        this.menuSprites.add(challengeButton);
         this.internalData.put("menu", menuSprites);
         this.internalData.put("play", playSprites);
 
