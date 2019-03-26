@@ -15,6 +15,7 @@ public class BattleSheep extends ApplicationAdapter {
 	private View view;
 	private Model model;
 	public static float delta;
+
 	@Override
 	public void create () {
 		while(!MyAssetManager.manager.update()){

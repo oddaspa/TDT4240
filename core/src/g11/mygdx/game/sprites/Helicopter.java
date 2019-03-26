@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector3;
 import g11.mygdx.game.BattleSheep;
 
 public class Helicopter extends Sprite implements AssetModel{
+
     private static final int GRAVITY = -7;
     private Vector3 position;
     private Vector3 velocity;

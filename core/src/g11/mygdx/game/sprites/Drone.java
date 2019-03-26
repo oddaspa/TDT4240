@@ -79,7 +79,6 @@ public class Drone extends Sprite implements AssetModel {
     }
 
 
-
     public Vector3 getVelocity() {
         return velocity;
     }
@@ -93,5 +92,4 @@ public class Drone extends Sprite implements AssetModel {
     public boolean collides(Rectangle player){
         return player.overlaps(bound);
     }
-
 }
