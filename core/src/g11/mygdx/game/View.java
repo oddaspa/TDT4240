@@ -33,7 +33,7 @@ public class View extends Screen {
     // METHODS TO GET THE DATA
 
     public void handleInput() {
-        if (Gdx.input.justTouched()) {
+        if (Gdx.input.isTouched()) {
             Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             gx = touchPos.x;
             gy = BattleSheep.HEIGHT - touchPos.y;
