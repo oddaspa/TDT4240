@@ -2,6 +2,7 @@ package g11.mygdx.game.states;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Array;
 
 import java.util.Random;
@@ -24,6 +25,17 @@ public class PlaceAnimalState implements IState{
             if(data[1]>600){
                 return "inGameStatus";
             }
+        }
+        else {
+            for (int i=64; i<this.placeAnimalSprites.size; i++){
+                Sprite animal = this.placeAnimalSprites.get(i);
+                if ( animal.getX() + animal.getWidth() > data[0] && data[0] > animal.getX() ){
+                    if ( animal.getY() + animal.getHeight() > data[1] && data[1] > animal.getY() ){
+                        System.out.println("animal touched");
+                        animal.setPosition(data[0] - animal.getWidth()/2,data[1] - animal.getHeight()/2);
+                    }
+            }
+        }
         }
         return "placeAnimalState";
     }
@@ -53,7 +65,10 @@ public class PlaceAnimalState implements IState{
         Sprite grass4 = new Sprite(g4);
         Sprite chicken = new Sprite(c);
         Sprite chicken2 = new Sprite(c);
+        Sprite chicken3 = new Sprite(c);
         Sprite sheep = new Sprite(sp);
+        Sprite sheep2 = new Sprite(sp);
+
 
         Array<Sprite> grassSprites = new Array<Sprite>();
         grassSprites.add(grass1);
@@ -70,11 +85,20 @@ public class PlaceAnimalState implements IState{
             }
         }
         chicken.setPosition(31, 140);
+        chicken.setSize(40,40);
         chicken2.setPosition(31 + chicken.getWidth() + 10 , 140);
-        sheep.setPosition(31 + 2* (chicken.getWidth() + 10), 140);
+        chicken2.setSize(40,40);
+        chicken3.setPosition(31 + 2* (chicken.getWidth() + 10) , 140);
+        chicken3.setSize(40,40);
+        sheep.setPosition(31 + 3* (chicken.getWidth() + 10), 140);
+        sheep.setSize(150,100);
+        sheep2.setPosition(31 + 3* (chicken.getWidth() + 10) + sheep.getWidth(), 140);
+        sheep2.setSize(90,60);
         this.placeAnimalSprites.add(chicken);
         this.placeAnimalSprites.add(chicken2);
+        this.placeAnimalSprites.add(chicken3);
         this.placeAnimalSprites.add(sheep);
+        this.placeAnimalSprites.add(sheep2);
         this.placeAnimalMessages.add("Place Your Animals");
         this.placeAnimalMessages.add("");
         this.placeAnimalMessages.add("");
