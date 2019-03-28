@@ -1,11 +1,9 @@
 package g11.mygdx.game;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Array;
 
-import java.util.Random;
-
+import g11.mygdx.game.states.InGameState;
 import g11.mygdx.game.states.MenuState;
 import g11.mygdx.game.states.PlaceAnimalState;
 
@@ -13,11 +11,13 @@ public class Model {
     private String currentMode;
     private MenuState menu;
     private PlaceAnimalState placeAnimal;
+    private InGameState inGameState;
     // MAKE ALL THE STATES
 
     public Model(){
         this.menu = new MenuState();
         this.placeAnimal = new PlaceAnimalState();
+        this.inGameState = new InGameState();
         this.currentMode = "menuState";
 
     }
@@ -29,16 +29,27 @@ public class Model {
         if(currentMode.equals("placeAnimalState")){
             this.currentMode = this.placeAnimal.parseInput(data);
         }
+        if(currentMode.equals("inGameStatus")){
+            this.currentMode = this.inGameState.parseInput(data);
+        }
     }
 
     public Array<Sprite> serveData(){
         if(this.currentMode.equals("menuState")){
             return this.menu.serveData();
-        } else
+        }
+        if(currentMode.equals("inGameStatus")){
+            return this.inGameState.serveData();
+        }
+        else{
             return this.placeAnimal.serveData();
+        }
     }
 
     public Array<String> serveMessages(){
+        if(currentMode.equals("inGameStatus")){
+            return this.inGameState.serveMessages();
+        }
         if(this.currentMode.equals("placeAnimalState")){
             return this.placeAnimal.serveMessages();
         }

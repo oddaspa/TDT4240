@@ -61,11 +61,9 @@ public class View extends Screen {
         font.setColor(Color.BLACK);
         if(msgs != null){
             font.draw(sb, msgs.get(0),BattleSheep.WIDTH/6, 720);
-            font.draw(sb, msgs.get(1),BattleSheep.WIDTH/10, 775);
-            font.draw(sb, msgs.get(2),BattleSheep.WIDTH/3, 50);
+            font.draw(sb, msgs.get(1),400, 790);
+            font.draw(sb, msgs.get(2),10, 40);
         }
-
-
         sb.end();
     }
 

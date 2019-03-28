@@ -20,6 +20,11 @@ public class PlaceAnimalState implements IState{
     }
     @Override
     public String parseInput(float[] data) {
+        if(data[0]>400){
+            if(data[1]>600){
+                return "inGameStatus";
+            }
+        }
         return "placeAnimalState";
     }
 
