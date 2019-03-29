@@ -14,19 +14,46 @@ public class InGameState implements IState {
     private Array<Sprite> opponentBoard;
     private Array<Sprite> myBoard;
     private Array<String> inGameMessages;
-    double col = 0;
-    double row = 0;
+    private double col = 0;
+    private double row = 0;
+    private float LEFTBORDER = 1 + BattleSheep.WIDTH / 20;
+    private float RIGHTBOARDER = 8 * BattleSheep.WIDTH / 10 + 1 + BattleSheep.WIDTH / 20;
+    private float TOPBORDER = 8 * BattleSheep.WIDTH / 10 + 1 + 300;
+    private float BOTTOMBORDER = 1 + 300;
+
+    private Array<Integer> enemyAnimals;
     public InGameState(){
         this.myBoard = new Array<Sprite>();
         this.opponentBoard = new Array<Sprite>();
         this.inGameMessages = new Array<String>();
+        this.enemyAnimals = new Array<Integer>();
         loadData();
+        System.out.println(this.opponentBoard.size);
     }
 
 
     @Override
     public String parseInput(float[] data) {
-        handleCoordiantes(data);
+        float[] spritePosition = new float[2];
+        float spriteX;
+        float spriteY;
+        double[] coordinates = parsePosition(data);
+        double[] spriteCoordinates;
+        if(coordinates[1] != -1){
+            if(this.opponentBoard != null){
+                for(Sprite c : this.opponentBoard){
+                    spriteX = c.getX() + c.getWidth()/2;
+                    spriteY = c.getY() + c.getHeight()/2;
+                    spritePosition[0] = spriteX;
+                    spritePosition[1] = spriteY;
+                    spriteCoordinates = parsePosition(spritePosition);
+                    if(coordinates[0] == spriteCoordinates[0] && coordinates[1] == spriteCoordinates[1]){
+                        //TODO: set sprite to isHit and update texture.
+                        this.opponentBoard.get(this.opponentBoard.indexOf(c, false)).setSize(10,10);
+                    }
+                }
+            }
+        }
         return "inGameStatus";
     }
 
@@ -42,26 +69,28 @@ public class InGameState implements IState {
         return allData;
     }
 
+
     @Override
     public void loadData() {
         placeOpponentBoard("oppBoard.txt");
         placeMyBoard("myBoard.txt");
     }
 
-    public void handleCoordiantes(float[] data){
-        float LEFTBORDER = 1 + BattleSheep.WIDTH / 20;
-        float RIGHTBOARDER = 8 * BattleSheep.WIDTH / 10 + 1 + BattleSheep.WIDTH / 20;
-        float TOPBORDER = 8 * BattleSheep.WIDTH / 10 + 1 + 300;
-        float BOTTOMBORDER = 1 + 300;
+    public double[] parsePosition(float[] data){
+        double[] output = new double[2];
+        output[0] = -1;
+        output[1] = -1;
         if(data[0] < RIGHTBOARDER && data[0]  > LEFTBORDER){
             float POS_X = data[0] - LEFTBORDER;
             if(data[1] < TOPBORDER && data[1] > BOTTOMBORDER){
                 float POS_Y = data[1] - BOTTOMBORDER;
                 row = Math.ceil((POS_Y/(TOPBORDER-BOTTOMBORDER))*8);
                 col = Math.ceil((POS_X/(RIGHTBOARDER-LEFTBORDER))*8);
-                System.out.println("col: " + (col) + ", row: " + (row));
+                output[0] = col;
+                output[1] = row;
             }
         }
+        return output;
     }
 
     public String[] readFile(String file) {
@@ -175,12 +204,15 @@ public class InGameState implements IState {
                     Sprite chicken = new Sprite(tex, BattleSheep.WIDTH / 10 - 2, BattleSheep.WIDTH / 10 - 2);
                     chicken.setPosition(j * BattleSheep.WIDTH / 10 + 1 + BattleSheep.WIDTH / 20, i * BattleSheep.WIDTH / 10 + 1 + 300);
                     this.opponentBoard.add(chicken);
+                    this.enemyAnimals.add(i*7 + j-1);
                 }
                 if (c == 'b') {
                     Texture tex = new Texture("heli13.png");
                     Sprite sheep = new Sprite(tex, BattleSheep.WIDTH / 10 - 2, BattleSheep.WIDTH / 10 - 2);
                     sheep.setPosition(j * BattleSheep.WIDTH / 10 + 1 + BattleSheep.WIDTH / 20, i * BattleSheep.WIDTH / 10 + 1 + 300);
                     this.opponentBoard.add(sheep);
+                    this.enemyAnimals.add(i*7 + j-1);
+                    this.enemyAnimals.add(i*7 + j);
 
                 }
                 j++;
