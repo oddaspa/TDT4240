@@ -160,7 +160,6 @@ public class InGameState implements IState {
         Sprite bonde = new Sprite(b,b.getWidth()/2,b.getHeight()/2);
         bonde.setPosition(420,50);
         this.myBoard.add(bonde);
-        this.inGameMessages.add("Odd Gunnar");
     }
 
     //TODO: USE CORRECT SPRITES
@@ -182,6 +181,7 @@ public class InGameState implements IState {
         grassSprites.add(grass2);
         grassSprites.add(grass3);
         grassSprites.add(grass4);
+        this.inGameMessages.add("");
         this.inGameMessages.add(fromFile[0]);
         int i = 0;
         int j = 0;
@@ -224,7 +224,7 @@ public class InGameState implements IState {
         Sprite bonde = new Sprite(b,b.getWidth()/2,b.getHeight()/2);
         bonde.setPosition(60,700);
         this.myBoard.add(bonde);
-        this.inGameMessages.add("");
-        this.inGameMessages.add("Oscar");
+
+
     }
 }
