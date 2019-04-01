@@ -9,12 +9,14 @@ import com.badlogic.gdx.utils.Array;
 import java.util.Random;
 
 import g11.mygdx.game.BattleSheep;
+import g11.mygdx.game.modules.HomeButton;
 import g11.mygdx.game.sprites.Helicopter;
 
 public class InGameState implements IState {
     private Array<Sprite> opponentBoard;
     private Array<Sprite> myBoard;
     private Array<String> inGameMessages;
+    private HomeButton homeButton = new HomeButton();
     private double col = 0;
     private double row = 0;
     private float LEFTBORDER = 1 + BattleSheep.WIDTH / 20;
@@ -35,6 +37,9 @@ public class InGameState implements IState {
 
     @Override
     public String parseInput(float[] data) {
+        if (this.homeButton.isClicked(data[0], data[1])) {
+            return "menuState";
+        }
         float[] spritePosition = new float[2];
         float spriteX;
         float spriteY;
@@ -72,6 +77,7 @@ public class InGameState implements IState {
     public Array<Sprite> serveData() {
         Array<Sprite> allData = this.myBoard;
         allData.addAll(this.opponentBoard);
+        allData.add(this.homeButton.getHomeButton());
         return allData;
     }
 
