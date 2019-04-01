@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import java.util.Random;
 
 import g11.mygdx.game.BattleSheep;
+import g11.mygdx.game.sprites.Helicopter;
 
 public class InGameState implements IState {
     private Array<Sprite> opponentBoard;
@@ -49,7 +50,12 @@ public class InGameState implements IState {
                     spriteCoordinates = parsePosition(spritePosition);
                     if(coordinates[0] == spriteCoordinates[0] && coordinates[1] == spriteCoordinates[1]){
                         //TODO: set sprite to isHit and update texture.
-                        this.opponentBoard.get(this.opponentBoard.indexOf(c, false)).setSize(10,10);
+                        if(c instanceof Helicopter){
+                            ((Helicopter) c).gotHit();
+                        } else{
+                            this.opponentBoard.get(this.opponentBoard.indexOf(c, false)).setSize(10,10);
+                        }
+
                     }
                 }
             }
@@ -98,6 +104,16 @@ public class InGameState implements IState {
         String text = handle.readString();
         String wordsArray[] = text.split("\\r?\\n");
         return wordsArray;
+    }
+    public void writeFile(String file, int col, int row, char item){
+        FileHandle handle = Gdx.files.local(file);
+        String text = handle.readString();
+        String wordsArray[] = text.split("\\r?\\n");
+        wordsArray[row].toCharArray()[col] = item;
+        for(String s : wordsArray){
+            handle.writeString(s, false);
+        }
+
     }
 
     private void placeMyBoard(String file){
@@ -208,9 +224,10 @@ public class InGameState implements IState {
                 }
                 if (c == 'b') {
                     Texture tex = new Texture("heli13.png");
-                    Sprite sheep = new Sprite(tex, BattleSheep.WIDTH / 10 - 2, BattleSheep.WIDTH / 10 - 2);
-                    sheep.setPosition(j * BattleSheep.WIDTH / 10 + 1 + BattleSheep.WIDTH / 20, i * BattleSheep.WIDTH / 10 + 1 + 300);
-                    this.opponentBoard.add(sheep);
+                    Helicopter heli = new Helicopter(tex);
+                    heli.setSize(BattleSheep.WIDTH / 10 - 2, BattleSheep.WIDTH / 10 - 2);
+                    heli.setPosition(j * BattleSheep.WIDTH / 10 + 1 + BattleSheep.WIDTH / 20, i * BattleSheep.WIDTH / 10 + 1 + 300);
+                    this.opponentBoard.add(heli);
                     this.enemyAnimals.add(i*7 + j-1);
                     this.enemyAnimals.add(i*7 + j);
 
