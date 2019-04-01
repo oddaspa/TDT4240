@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector3;
 
 import java.util.Random;
 
-public class Drone extends Sprite implements AssetModel {
+public class Drone extends Sprite {
     private static final int GRAVITY = -2;
     private Vector3 position;
     private Vector3 velocity;
