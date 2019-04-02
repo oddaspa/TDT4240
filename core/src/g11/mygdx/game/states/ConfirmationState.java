@@ -50,7 +50,11 @@ public class ConfirmationState implements IState {
 
     @Override
     public String parseInput(float[] data) {
-        return confirmUserChoice(data[0], data[1]);
+        if (data == null) {
+            return "confirmationState";
+        } else {
+            return confirmUserChoice(data[0], data[1]);
+        }
     }
 
     @Override

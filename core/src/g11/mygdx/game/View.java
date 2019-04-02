@@ -37,12 +37,16 @@ public class View extends Screen {
             Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             gx = touchPos.x;
             gy = BattleSheep.HEIGHT - touchPos.y;
-            System.out.println("(X: " + gx + ", Y:" + gy + ")");
+            float[] coordinates = new float[2];
+            coordinates[0] = gx;
+            coordinates[1] = gy;
+            this.channel.update(coordinates);
+        }else {
+            //no new input
+            this.channel.update(null);
         }
-        float[] coordinates = new float[2];
-        coordinates[0] = gx;
-        coordinates[1] = gy;
-        this.channel.update(coordinates);
+        //prints where input starts
+        if (Gdx.input.justTouched()){System.out.println("(X: " + gx + ", Y:" + gy + ")");}
     }
 
     @Override

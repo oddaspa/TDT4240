@@ -1,52 +1,193 @@
 package g11.mygdx.game.states;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.util.Random;
 
 import g11.mygdx.game.BattleSheep;
 import g11.mygdx.game.modules.HomeButton;
+import g11.mygdx.game.sprites.Chicken;
+import g11.mygdx.game.sprites.Grass;
+import g11.mygdx.game.sprites.Sheep;
 
 
 public class PlaceAnimalState implements IState{
     private Array<Sprite> placeAnimalSprites;
     private Array<String> placeAnimalMessages;
     private HomeButton homeButton;
+    private Sprite selectedAnimal;
 
     public PlaceAnimalState(){
         this.placeAnimalSprites = new Array<Sprite>();
         this.placeAnimalMessages = new Array<String>();
-        loadData();
+        this.selectedAnimal = null;
 
         Texture homeButtonTexture = new Texture("home.png");
         Sprite homeButtonSprite = new Sprite(homeButtonTexture, homeButtonTexture.getWidth() / 6, homeButtonTexture.getHeight() / 6);
         this.homeButton = new HomeButton(homeButtonSprite, (float) 10, (float) BattleSheep.HEIGHT - 10 - homeButtonSprite.getHeight());
 
+        loadData();
+
     }
+
     @Override
     public String parseInput(float[] data) {
-        if (this.homeButton.isClicked(data[0], data[1])) {
+        if (data == null) {
+            if (this.selectedAnimal != null) {
+                this.snapOnGrid(); //runs only when an animal is released
+                selectedAnimal = null;
+            }
+        } else if (this.homeButton.isClicked(data[0], data[1])) {
             return "confirmationState";
         }
-        if(data[0]>400){
-            if(data[1]>600){
-                return "inGameStatus";
-            }
+        else if(data[0]>420 && data[1]>660){
+            return this.goToGame();
         }
         else {
-            for (int i=64; i<this.placeAnimalSprites.size; i++){
+            boolean touched = false;
+            Sprite newSelectedAnimal = null;
+            for (int i=65; i<this.placeAnimalSprites.size; i++){
                 Sprite animal = this.placeAnimalSprites.get(i);
-                if ( animal.getX() + animal.getWidth() > data[0] && data[0] > animal.getX() ){
-                    if ( animal.getY() + animal.getHeight() > data[1] && data[1] > animal.getY() ){
-                        System.out.println("animal touched");
-                        animal.setPosition(data[0] - animal.getWidth()/2,data[1] - animal.getHeight()/2);
-                    }
+                //check if input is on top of animal
+                if ( this.touches(animal,data) ){
+                    touched = true;
+                    newSelectedAnimal = animal;
+                    break;
+                }
+            }
+            if (!touched) {
+                selectedAnimal = null;
+                return "placeAnimalState";
+            }
+            //if new animal was selected and we have no current moving animal
+            if (newSelectedAnimal != null && selectedAnimal == null){
+                this.selectedAnimal = newSelectedAnimal;
+            }
+
+            //if an animal is selected
+            if (selectedAnimal != null){
+                selectedAnimal.setPosition(data[0] - selectedAnimal.getWidth()/2,data[1] - selectedAnimal.getHeight()/2);
             }
         }
-        }
+
         return "placeAnimalState";
+    }
+
+    public String goToGame(){
+        boolean allAnimalsPlaced = true;
+        for (int i = 65; i < this.placeAnimalSprites.size; i++){
+            if (this.placeAnimalSprites.get(i).getY() < 221){
+                allAnimalsPlaced = false;
+            }
+        }
+
+        if (allAnimalsPlaced){
+            this.turnBoardToFile();
+            return "inGameStatus";
+        }else{
+            this.placeAnimalMessages.removeIndex(2);
+            placeAnimalMessages.add("Place all animals to continue");
+            return "placeAnimalState";
+        }
+    }
+
+    public void turnBoardToFile(){
+        String flippedBoard = "";
+        for (int i = 63; i >= 0; i--){
+            Sprite grass = this.placeAnimalSprites.get(i);
+            String symbol = ".";
+            for (int j = 65; j < this.placeAnimalSprites.size; j++){
+                Sprite animal = this.placeAnimalSprites.get(j);
+                if (animal.getBoundingRectangle().overlaps(grass.getBoundingRectangle())){
+                    symbol = animal.toString();
+                }
+            }
+            flippedBoard += symbol;
+        }
+        String board = "";
+        for (int i=0; i<8; i++){
+            String boardRow = flippedBoard.substring(i*8,((i+1)*8));
+            byte [] boardRowAsByteArray = boardRow.getBytes();
+
+            byte [] result = new byte [boardRowAsByteArray.length];
+
+            // Store result in reverse order into the
+            // result byte[]
+            for (int j = 0; j<boardRowAsByteArray.length; j++)
+                result[j] = boardRowAsByteArray[boardRowAsByteArray.length-j-1];
+            boardRow = new String(result);
+            board += boardRow + "\n";
+        }
+        FileHandle handle = Gdx.files.local("myBoard.txt");
+        String text = handle.readString();
+        String fileRowArray[] = text.split("\\r?\\n");
+        String newFileText = fileRowArray[0] + "\n" + board;
+        handle.writeString(newFileText, false);
+    }
+
+
+    public boolean touches(Sprite animal, float[] input) {
+        boolean touches = false;
+        if ( animal.getX() + animal.getWidth() > input[0] && input[0] > animal.getX() ){
+            if ( animal.getY() + animal.getHeight() > input[1] && input[1] > animal.getY() ){
+                touches = true;
+            }}
+        return touches;
+    }
+
+    public void snapOnGrid() {
+        if (selectedAnimal.getX() > 365) {
+            if (selectedAnimal instanceof Sheep){
+                selectedAnimal.setPosition(365,selectedAnimal.getY());
+            } else {
+                selectedAnimal.setPosition(408,selectedAnimal.getY());
+            }
+        } else if (selectedAnimal.getX() < 37) {
+            selectedAnimal.setPosition(37,selectedAnimal.getY());
+        }
+        if (selectedAnimal.getY() > 635) {
+            if (selectedAnimal instanceof Sheep){
+                selectedAnimal.setPosition(selectedAnimal.getX(),585);
+            } else {
+                selectedAnimal.setPosition(selectedAnimal.getX(),650);
+            }
+        } else if (selectedAnimal.getY() < 262 && selectedAnimal.getY() > 220) {
+            selectedAnimal.setPosition(selectedAnimal.getX(),262);
+        }
+        for (int i=0; i<65; i++) {
+            Sprite grassCell = this.placeAnimalSprites.get(i);
+            int offset = (int)grassCell.getHeight()/2;
+            if (selectedAnimal.getX() + offset >= grassCell.getX() && selectedAnimal.getX() + offset <= grassCell.getX() + grassCell.getWidth() + 2) {
+                if (selectedAnimal.getY() + 10 >= grassCell.getY() && selectedAnimal.getY() + 10 <= grassCell.getY() + grassCell.getHeight()){
+
+                    if (selectedAnimal instanceof Sheep){
+                        selectedAnimal.setPosition(grassCell.getX(), grassCell.getY() + 15);
+                    }else if (selectedAnimal instanceof Chicken){
+                        selectedAnimal.setPosition(grassCell.getX() + 5, grassCell.getY() + 3);
+                    }else {
+                        selectedAnimal.setPosition(grassCell.getX(), grassCell.getY());
+                    }
+                    this.checkValidPosition();
+                }
+            }
+        }
+    }
+
+    public void checkValidPosition(){
+        for (int i=65; i<this.placeAnimalSprites.size; i++){
+            Sprite animal = this.placeAnimalSprites.get(i);
+            if ( selectedAnimal != animal && selectedAnimal.getBoundingRectangle().overlaps(animal.getBoundingRectangle()) ){
+                System.out.println(selectedAnimal + " overlapping " + animal);
+                selectedAnimal.setPosition(animal.getX(),140);
+            }
+        }
     }
 
     @Override
@@ -63,54 +204,38 @@ public class PlaceAnimalState implements IState{
 
     @Override
     public void loadData() {
-        Random rand = new Random();
-        Texture c = new Texture("chicken-liten.png");
-        Texture sp = new Texture("sheep-liten.png");
-        Texture g1 = new Texture("grass-1.png");
-        Texture g2 = new Texture("grass-2.png");
-        Texture g3 = new Texture("grass-3.png");
-        Texture g4 = new Texture("grass-4.png");
-        Sprite grass1 = new Sprite(g1);
-        Sprite grass2 = new Sprite(g2);
-        Sprite grass3 = new Sprite(g3);
-        Sprite grass4 = new Sprite(g4);
-        Sprite chicken = new Sprite(c);
-        Sprite chicken2 = new Sprite(c);
-        Sprite chicken3 = new Sprite(c);
-        Sprite sheep = new Sprite(sp);
-        Sprite sheep2 = new Sprite(sp);
-
-
-        Array<Sprite> grassSprites = new Array<Sprite>();
-        grassSprites.add(grass1);
-        grassSprites.add(grass2);
-        grassSprites.add(grass3);
-        grassSprites.add(grass4);
+        Sprite chicken = new Chicken(40,40);
+        chicken.setPosition((2 * BattleSheep.WIDTH / 9),140);
+        Sprite chicken2 = new Chicken(40,40);
+        chicken2.setPosition(3 * (BattleSheep.WIDTH / 9),140);
+        Sprite chicken3 = new Chicken(40,40);
+        chicken3.setPosition(4 * (BattleSheep.WIDTH / 9),140);
+        Sprite sheep = new Sheep(100,70);
+        sheep.setPosition(5 * (BattleSheep.WIDTH / 9), 140);
+        Sprite sheep2 = new Sheep(100,70);
+        sheep2.setPosition(7 * (BattleSheep.WIDTH / 9) -10 ,140);
+        Sprite farmer = new Sprite();
+        farmer.setTexture(new Texture("bonde-liten.png"));
+        farmer.setPosition(5,150);
+        farmer.setSize(60,120);
         //place grass cells
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                int n = rand.nextInt(4);
-                Sprite s = new Sprite(grassSprites.get(n).getTexture(), BattleSheep.WIDTH / 9 - 2, BattleSheep.WIDTH / 9 - 2);
-                s.setPosition(j * (BattleSheep.WIDTH / 9)+ 1 + 30, i * BattleSheep.WIDTH / 9 + 1 + 260);
-                this.placeAnimalSprites.add(s);
+                Sprite grassCell = new Grass();
+                grassCell.setPosition(j * (BattleSheep.WIDTH / 9)+ 1 + 30,i * BattleSheep.WIDTH / 9 + 1 + 260);
+                grassCell.setSize( BattleSheep.WIDTH / 9 - 2, BattleSheep.WIDTH / 9 - 2);
+                this.placeAnimalSprites.add(grassCell);
             }
         }
-        chicken.setPosition(31, 140);
-        chicken.setSize(40,40);
-        chicken2.setPosition(31 + chicken.getWidth() + 10 , 140);
-        chicken2.setSize(40,40);
-        chicken3.setPosition(31 + 2* (chicken.getWidth() + 10) , 140);
-        chicken3.setSize(40,40);
-        sheep.setPosition(31 + 3* (chicken.getWidth() + 10), 140);
-        sheep.setSize(150,100);
-        sheep2.setPosition(31 + 3* (chicken.getWidth() + 10) + sheep.getWidth(), 140);
-        sheep2.setSize(90,60);
+
+        this.placeAnimalSprites.add(farmer);
+
         this.placeAnimalSprites.add(chicken);
         this.placeAnimalSprites.add(chicken2);
         this.placeAnimalSprites.add(chicken3);
         this.placeAnimalSprites.add(sheep);
         this.placeAnimalSprites.add(sheep2);
-        this.placeAnimalMessages.add("Place Your Animals");
+        this.placeAnimalMessages.add("     Place Your Animals");
         this.placeAnimalMessages.add("");
         this.placeAnimalMessages.add("");
     }
