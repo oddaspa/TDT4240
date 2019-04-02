@@ -21,12 +21,15 @@ public class MenuState implements IState {
     }
     @Override
     public String parseInput(float[] data){
-        Sprite button = this.menuSprites.get(1);
-        //      Y  >      400      &&  Y      <       570
-        if(data[1] > button.getY() && data[1] < button.getY() + button.getHeight()){
-            //  X      >   45          &&  X      <       435
-            if(data[0] > button.getX() && data[0] < button.getX() + button.getWidth()){
-                return "placeAnimalState";
+        if (data == null) {return "menuState";}
+        else{
+            Sprite button = this.menuSprites.get(1);
+            //      Y  >      400      &&  Y      <       570
+            if(data[1] > button.getY() && data[1] < button.getY() + button.getHeight()){
+                //  X      >   45          &&  X      <       435
+                if(data[0] > button.getX() && data[0] < button.getX() + button.getWidth()){
+                    return "placeAnimalState";
+                }
             }
         }
         return "menuState";
