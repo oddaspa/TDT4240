@@ -5,17 +5,20 @@ import com.badlogic.gdx.utils.Array;
 
 import g11.mygdx.game.states.InGameState;
 import g11.mygdx.game.states.MenuState;
+import g11.mygdx.game.states.LoadingState;
 import g11.mygdx.game.states.PlaceAnimalState;
 
 public class Model {
     private String currentMode;
     private MenuState menu;
+    private LoadingState loading;
     private PlaceAnimalState placeAnimal;
     private InGameState inGameState;
     // MAKE ALL THE STATES
 
     public Model(){
         this.menu = new MenuState();
+        this.loading = new LoadingState();
         this.placeAnimal = new PlaceAnimalState();
         this.inGameState = new InGameState();
         this.currentMode = "menuState";
@@ -25,6 +28,9 @@ public class Model {
     public void parseInput(float[] data){
         if(currentMode.equals("menuState")){
             this.currentMode = this.menu.parseInput(data);
+        }
+        if(currentMode.equals("loadingState")){
+            this.currentMode = this.loading.parseInput(data);
         }
         if(currentMode.equals("placeAnimalState")){
             this.currentMode = this.placeAnimal.parseInput(data);
@@ -37,6 +43,9 @@ public class Model {
     public Array<Sprite> serveData(){
         if(this.currentMode.equals("menuState")){
             return this.menu.serveData();
+        }
+        if(currentMode.equals("loadingState")){
+            return this.loading.serveData();
         }
         if(currentMode.equals("inGameStatus")){
             return this.inGameState.serveData();
