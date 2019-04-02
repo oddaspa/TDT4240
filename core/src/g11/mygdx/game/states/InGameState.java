@@ -16,7 +16,7 @@ public class InGameState implements IState {
     private Array<Sprite> opponentBoard;
     private Array<Sprite> myBoard;
     private Array<String> inGameMessages;
-    private HomeButton homeButton = new HomeButton();
+    private HomeButton homeButton;
     private double col = 0;
     private double row = 0;
     private float LEFTBORDER = 1 + BattleSheep.WIDTH / 20;
@@ -32,13 +32,21 @@ public class InGameState implements IState {
         this.enemyAnimals = new Array<Integer>();
         loadData();
         System.out.println(this.opponentBoard.size);
+
+        Texture homeButtonTexture = new Texture("home.png");
+        Sprite homeButtonSprite = new Sprite(homeButtonTexture, homeButtonTexture.getWidth() / 6, homeButtonTexture.getHeight() / 6);
+        homeButtonSprite.setPosition((float) 10, (float) BattleSheep.HEIGHT - 10 - homeButtonSprite.getHeight());
+
+        this.homeButton = new HomeButton(homeButtonSprite);
+
     }
 
 
     @Override
     public String parseInput(float[] data) {
         if (this.homeButton.isClicked(data[0], data[1])) {
-            return "menuState";
+            ConfirmationState confirmation = new ConfirmationState("inGameStatus", "menuState");
+
         }
         float[] spritePosition = new float[2];
         float spriteX;
