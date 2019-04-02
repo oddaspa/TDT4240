@@ -13,6 +13,7 @@ import java.util.Random;
 
 import g11.mygdx.game.BattleSheep;
 import g11.mygdx.game.modules.HomeButton;
+import g11.mygdx.game.modules.PlayButton;
 import g11.mygdx.game.sprites.Chicken;
 import g11.mygdx.game.sprites.Grass;
 import g11.mygdx.game.sprites.Sheep;
@@ -22,18 +23,29 @@ public class PlaceAnimalState implements IState{
     private Array<Sprite> placeAnimalSprites;
     private Array<String> placeAnimalMessages;
     private HomeButton homeButton;
+    private PlayButton playButton;
     private Sprite selectedAnimal;
+    private Array<Sprite> allData;
 
     public PlaceAnimalState(){
         this.placeAnimalSprites = new Array<Sprite>();
         this.placeAnimalMessages = new Array<String>();
+        this.allData = new Array<Sprite>();
         this.selectedAnimal = null;
 
         Texture homeButtonTexture = new Texture("home.png");
         Sprite homeButtonSprite = new Sprite(homeButtonTexture, homeButtonTexture.getWidth() / 6, homeButtonTexture.getHeight() / 6);
         this.homeButton = new HomeButton(homeButtonSprite, (float) 10, (float) BattleSheep.HEIGHT - 10 - homeButtonSprite.getHeight());
 
+        Texture playButtonTexture = new Texture("play.png");
+        Sprite playButtonSprite = new Sprite(playButtonTexture, playButtonTexture.getWidth() / 2, homeButtonTexture.getHeight() / 6);
+        this.playButton = new PlayButton(playButtonSprite, BattleSheep.WIDTH - 10 - playButtonSprite.getWidth(), BattleSheep.HEIGHT - 10 - playButtonSprite.getHeight());
+
         loadData();
+
+        this.allData.addAll(placeAnimalSprites);
+        this.allData.add(playButton.getButton());
+        this.allData.add(homeButton.getButton());
 
     }
 
@@ -46,8 +58,7 @@ public class PlaceAnimalState implements IState{
             }
         } else if (this.homeButton.isClicked(data[0], data[1])) {
             return "confirmationState";
-        }
-        else if(data[0]>420 && data[1]>660){
+        } else if (this.playButton.isClicked(data[0], data[1])) {
             return this.goToGame();
         }
         else {
@@ -197,7 +208,7 @@ public class PlaceAnimalState implements IState{
 
     @Override
     public Array<Sprite> serveData() {
-        Array<Sprite> allData = this.placeAnimalSprites;
+
         allData.add(this.homeButton.getButton());
         return allData;
     }
