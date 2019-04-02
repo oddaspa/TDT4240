@@ -2,7 +2,6 @@ package g11.mygdx.game.sprites;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-
 import java.util.concurrent.ThreadLocalRandom;
 
 import g11.mygdx.game.BattleSheep;
@@ -35,10 +34,12 @@ public class Grass extends Sprite{
             return ground;
         }
     }
+
     @Override
     public String toString(){
         return ".";
     }
+
 
     public void setAnimal(Sprite animal){
         this.hasAnimal = true;
@@ -52,3 +53,5 @@ public class Grass extends Sprite{
 
 
 }
+
+

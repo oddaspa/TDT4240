@@ -35,6 +35,7 @@ public class InGameState implements IState {
 
     @Override
     public String parseInput(float[] data) {
+        if (data == null) {return "inGameStatus";}
         float[] spritePosition = new float[2];
         float spriteX;
         float spriteY;
