@@ -12,6 +12,7 @@ import com.sun.org.apache.xpath.internal.operations.Bool;
 import java.util.Random;
 
 import g11.mygdx.game.BattleSheep;
+import g11.mygdx.game.modules.HomeButton;
 import g11.mygdx.game.sprites.Chicken;
 import g11.mygdx.game.sprites.Grass;
 import g11.mygdx.game.sprites.Sheep;
@@ -20,14 +21,22 @@ import g11.mygdx.game.sprites.Sheep;
 public class PlaceAnimalState implements IState{
     private Array<Sprite> placeAnimalSprites;
     private Array<String> placeAnimalMessages;
+    private HomeButton homeButton;
     private Sprite selectedAnimal;
 
     public PlaceAnimalState(){
         this.placeAnimalSprites = new Array<Sprite>();
         this.placeAnimalMessages = new Array<String>();
         this.selectedAnimal = null;
+
+        Texture homeButtonTexture = new Texture("home.png");
+        Sprite homeButtonSprite = new Sprite(homeButtonTexture, homeButtonTexture.getWidth() / 6, homeButtonTexture.getHeight() / 6);
+        this.homeButton = new HomeButton(homeButtonSprite, (float) 10, (float) BattleSheep.HEIGHT - 10 - homeButtonSprite.getHeight());
+
         loadData();
+
     }
+
     @Override
     public String parseInput(float[] data) {
         if (data == null) {
@@ -35,6 +44,8 @@ public class PlaceAnimalState implements IState{
                 this.snapOnGrid(); //runs only when an animal is released
                 selectedAnimal = null;
             }
+        } else if (this.homeButton.isClicked(data[0], data[1])) {
+            return "confirmationState";
         }
         else if(data[0]>420 && data[1]>660){
             return this.goToGame();
@@ -130,7 +141,8 @@ public class PlaceAnimalState implements IState{
             }}
         return touches;
     }
-    public void snapOnGrid(){
+
+    public void snapOnGrid() {
         if (selectedAnimal.getX() > 365) {
             if (selectedAnimal instanceof Sheep){
                 selectedAnimal.setPosition(365,selectedAnimal.getY());
@@ -185,7 +197,9 @@ public class PlaceAnimalState implements IState{
 
     @Override
     public Array<Sprite> serveData() {
-        return this.placeAnimalSprites;
+        Array<Sprite> allData = this.placeAnimalSprites;
+        allData.add(this.homeButton.getButton());
+        return allData;
     }
 
     @Override

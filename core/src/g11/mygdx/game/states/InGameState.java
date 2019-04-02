@@ -7,6 +7,10 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Array;
 
 import g11.mygdx.game.BattleSheep;
+import g11.mygdx.game.Model;
+import g11.mygdx.game.modules.HomeButton;
+import g11.mygdx.game.sprites.Helicopter;
+
 import g11.mygdx.game.sprites.Chicken;
 import g11.mygdx.game.sprites.Grass;
 import g11.mygdx.game.sprites.Sheep;
@@ -15,6 +19,7 @@ public class InGameState implements IState {
     private Array<Sprite> opponentBoard;
     private Array<Sprite> myBoard;
     private Array<String> inGameMessages;
+    private HomeButton homeButton;
     private double col = 0;
     private double row = 0;
     private float LEFTBORDER = 1 + BattleSheep.WIDTH / 20;
@@ -30,12 +35,20 @@ public class InGameState implements IState {
         this.enemyAnimals = new Array<Integer>();
         loadData();
         System.out.println(this.opponentBoard.size);
+
+        Texture homeButtonTexture = new Texture("home.png");
+        Sprite homeButtonSprite = new Sprite(homeButtonTexture, homeButtonTexture.getWidth() / 6, homeButtonTexture.getHeight() / 6);
+        this.homeButton = new HomeButton(homeButtonSprite, (float) 10, (float) BattleSheep.HEIGHT - 10 - homeButtonSprite.getHeight());
+
     }
 
 
     @Override
     public String parseInput(float[] data) {
         if (data == null) {return "inGameStatus";}
+        else if (this.homeButton.isClicked(data[0], data[1])) {
+            return "confirmationState";
+        }
         float[] spritePosition = new float[2];
         float spriteX;
         float spriteY;
@@ -80,6 +93,7 @@ public class InGameState implements IState {
     public Array<Sprite> serveData() {
         Array<Sprite> allData = this.myBoard;
         allData.addAll(this.opponentBoard);
+        allData.add(this.homeButton.getButton());
         return allData;
     }
 
