@@ -7,19 +7,29 @@ import com.badlogic.gdx.utils.Array;
 import java.util.Random;
 
 import g11.mygdx.game.BattleSheep;
+import g11.mygdx.game.modules.HomeButton;
 
 
 public class PlaceAnimalState implements IState{
     private Array<Sprite> placeAnimalSprites;
     private Array<String> placeAnimalMessages;
+    private HomeButton homeButton;
 
     public PlaceAnimalState(){
         this.placeAnimalSprites = new Array<Sprite>();
         this.placeAnimalMessages = new Array<String>();
         loadData();
+
+        Texture homeButtonTexture = new Texture("home.png");
+        Sprite homeButtonSprite = new Sprite(homeButtonTexture, homeButtonTexture.getWidth() / 6, homeButtonTexture.getHeight() / 6);
+        this.homeButton = new HomeButton(homeButtonSprite, (float) 10, (float) BattleSheep.HEIGHT - 10 - homeButtonSprite.getHeight());
+
     }
     @Override
     public String parseInput(float[] data) {
+        if (this.homeButton.isClicked(data[0], data[1])) {
+            return "confirmationState";
+        }
         if(data[0]>400){
             if(data[1]>600){
                 return "inGameStatus";
@@ -46,7 +56,9 @@ public class PlaceAnimalState implements IState{
 
     @Override
     public Array<Sprite> serveData() {
-        return this.placeAnimalSprites;
+        Array<Sprite> allData = this.placeAnimalSprites;
+        allData.add(this.homeButton.getButton());
+        return allData;
     }
 
     @Override
