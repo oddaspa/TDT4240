@@ -32,6 +32,9 @@ public class Model {
         if(currentMode.equals("inGameStatus")){
             this.currentMode = this.inGameState.parseInput(data);
         }
+        if(currentMode.equals("confirmationState")) {
+            // TODO make confirmation state
+        }
     }
 
     public Array<Sprite> serveData(){
