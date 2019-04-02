@@ -71,7 +71,7 @@ public class PlaceAnimalState implements IState{
 
     public String goToGame(){
         boolean allAnimalsPlaced = true;
-        for (int i=65; i<this.placeAnimalSprites.size; i++){
+        for (int i = 65; i < this.placeAnimalSprites.size; i++){
             if (this.placeAnimalSprites.get(i).getY() < 221){
                 allAnimalsPlaced = false;
             }
@@ -89,10 +89,10 @@ public class PlaceAnimalState implements IState{
 
     public void turnBoardToFile(){
         String flippedBoard = "";
-        for (int i=63; i>=0; i--){
+        for (int i = 63; i >= 0; i--){
             Sprite grass = this.placeAnimalSprites.get(i);
             String symbol = ".";
-            for (int j=65; j<this.placeAnimalSprites.size; j++){
+            for (int j = 65; j < this.placeAnimalSprites.size; j++){
                 Sprite animal = this.placeAnimalSprites.get(j);
                 if (animal.getBoundingRectangle().overlaps(grass.getBoundingRectangle())){
                     symbol = animal.toString();
@@ -190,11 +190,16 @@ public class PlaceAnimalState implements IState{
 
     @Override
     public void loadData() {
-        Sprite chicken = new Chicken((2 * BattleSheep.WIDTH / 9),140);
-        Sprite chicken2 = new Chicken(3 * (BattleSheep.WIDTH / 9),140);
-        Sprite chicken3 = new Chicken(4 * (BattleSheep.WIDTH / 9),140);
-        Sprite sheep = new Sheep(5 * (BattleSheep.WIDTH / 9), 140);
-        Sprite sheep2 = new Sheep(7 * (BattleSheep.WIDTH / 9) -10 ,140);
+        Sprite chicken = new Chicken(40,40);
+        chicken.setPosition((2 * BattleSheep.WIDTH / 9),140);
+        Sprite chicken2 = new Chicken(40,40);
+        chicken2.setPosition(3 * (BattleSheep.WIDTH / 9),140);
+        Sprite chicken3 = new Chicken(40,40);
+        chicken3.setPosition(4 * (BattleSheep.WIDTH / 9),140);
+        Sprite sheep = new Sheep(100,70);
+        sheep.setPosition(5 * (BattleSheep.WIDTH / 9), 140);
+        Sprite sheep2 = new Sheep(100,70);
+        sheep2.setPosition(7 * (BattleSheep.WIDTH / 9) -10 ,140);
         Sprite farmer = new Sprite();
         farmer.setTexture(new Texture("bonde-liten.png"));
         farmer.setPosition(5,150);
@@ -209,11 +214,6 @@ public class PlaceAnimalState implements IState{
             }
         }
 
-        chicken.setSize(40,40);
-        chicken2.setSize(40,40);
-        chicken3.setSize(40,40);
-        sheep.setSize(100,70);
-        sheep2.setSize(100,70);
         this.placeAnimalSprites.add(farmer);
 
         this.placeAnimalSprites.add(chicken);
