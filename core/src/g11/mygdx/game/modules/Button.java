@@ -6,8 +6,10 @@ public abstract class Button {
 
     private Sprite button;
 
-    public Button(Sprite buttonSprite) {
+    public Button(Sprite buttonSprite, float x, float y) {
         this.button = buttonSprite;
+
+        this.button.setPosition(x, y);
     }
 
     public boolean isClicked(float x, float y) {
@@ -22,4 +24,7 @@ public abstract class Button {
         return false;
     }
 
+    public Sprite getButton() {
+        return button;
+    }
 }

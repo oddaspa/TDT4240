@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 
 public class YesButton extends Button {
 
-    public YesButton(Sprite buttonSprite) {
-        super(buttonSprite);
+    public YesButton(Sprite buttonSprite, float x, float y) {
+        super(buttonSprite, x, y);
     }
 
 }

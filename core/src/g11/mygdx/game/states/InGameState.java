@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import java.util.Random;
 
 import g11.mygdx.game.BattleSheep;
+import g11.mygdx.game.Model;
 import g11.mygdx.game.modules.HomeButton;
 import g11.mygdx.game.sprites.Helicopter;
 
@@ -35,9 +36,7 @@ public class InGameState implements IState {
 
         Texture homeButtonTexture = new Texture("home.png");
         Sprite homeButtonSprite = new Sprite(homeButtonTexture, homeButtonTexture.getWidth() / 6, homeButtonTexture.getHeight() / 6);
-        homeButtonSprite.setPosition((float) 10, (float) BattleSheep.HEIGHT - 10 - homeButtonSprite.getHeight());
-
-        this.homeButton = new HomeButton(homeButtonSprite);
+        this.homeButton = new HomeButton(homeButtonSprite, (float) 10, (float) BattleSheep.HEIGHT - 10 - homeButtonSprite.getHeight());
 
     }
 
@@ -45,8 +44,7 @@ public class InGameState implements IState {
     @Override
     public String parseInput(float[] data) {
         if (this.homeButton.isClicked(data[0], data[1])) {
-            ConfirmationState confirmation = new ConfirmationState("inGameStatus", "menuState");
-
+            return "confirmationState";
         }
         float[] spritePosition = new float[2];
         float spriteX;
@@ -85,7 +83,7 @@ public class InGameState implements IState {
     public Array<Sprite> serveData() {
         Array<Sprite> allData = this.myBoard;
         allData.addAll(this.opponentBoard);
-        allData.add(this.homeButton.getHomeButton());
+        allData.add(this.homeButton.getButton());
         return allData;
     }
 

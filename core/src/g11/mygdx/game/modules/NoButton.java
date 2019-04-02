@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 public class NoButton extends Button {
 
 
-    public NoButton(Sprite buttonSprite) {
-        super(buttonSprite);
+    public NoButton(Sprite buttonSprite, float x, float y) {
+        super(buttonSprite, x, y);
     }
 }
