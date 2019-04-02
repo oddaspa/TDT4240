@@ -2,18 +2,22 @@ package g11.mygdx.game.sprites;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Rectangle;
+
+import g11.mygdx.game.BattleSheep;
 
 public class Chicken extends Sprite{
-    private Rectangle bounds;
-
-    public Chicken (int startX, int startY){
-        this.setPosition(startX,startY);
+    public Chicken (int width, int height){
+        super();
         Texture chicken = new Texture("chicken-liten.png");
         this.setTexture(chicken);
-        bounds = new Rectangle(startX, startY, chicken.getWidth(), chicken.getHeight());
+        this.setSize(width, height);
+
     }
 
+    public void gotHit(){
+        System.out.println("chicken got hit");
+        this.setSize(BattleSheep.WIDTH / 10 - 2, BattleSheep.WIDTH / 10 - 2);
+    }
 
     @Override
     public String toString(){
