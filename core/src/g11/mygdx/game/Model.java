@@ -24,10 +24,10 @@ public class Model {
         this.menu = new MenuState();
         this.loading = new LoadingState();
         this.placeAnimal = new PlaceAnimalState();
-        this.inGameState = new InGameState();
+        this.inGameState = null;
         this.previousState = "menuState";
         this.nextState = "";
-        this.currentMode = "menuState";
+        this.currentMode = "loadingState";
         this.confirmationState = new ConfirmationState(this.previousState);
 
 
@@ -43,7 +43,6 @@ public class Model {
             }
             this.currentMode = nextState;
             placeAnimal.setDefaultPosition(); //reset animals in placeAnimalState
-
         }
         if(currentMode.equals("loadingState")){
             this.currentMode = this.loading.parseInput(data);
@@ -57,6 +56,9 @@ public class Model {
 
         }
         if(currentMode.equals("inGameStatus")){
+            if(this.inGameState == null){
+                this.inGameState = new InGameState();
+            }
             nextState = this.inGameState.parseInput(data);
             if (!nextState.equals(this.previousState)) {
                 this.previousState = this.currentMode;
@@ -85,8 +87,9 @@ public class Model {
             return this.menu.serveData();
         }
 
-        if(currentMode.equals("loadingState")){
+        if(currentMode.equals("loadingState")) {
             return this.loading.serveData();
+        }
 
         if (this.currentMode.equals("confirmationState")) {
             return this.confirmationState.serveData();
