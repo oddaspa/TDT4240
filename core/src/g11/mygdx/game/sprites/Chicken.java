@@ -2,12 +2,12 @@ package g11.mygdx.game.sprites;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
+
 
 import g11.mygdx.game.BattleSheep;
 
 public class Chicken extends Sprite{
+
     Texture chicken1;
     Texture chicken2;
     boolean flip;
@@ -35,6 +35,11 @@ public class Chicken extends Sprite{
                 flip = true;
             }
         }
+    }
+
+    public void gotHit(){
+        this.setSize(BattleSheep.WIDTH / 10 - 2, BattleSheep.WIDTH / 10 - 2);
+
     }
 
     @Override

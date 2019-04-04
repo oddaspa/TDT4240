@@ -2,18 +2,29 @@ package g11.mygdx.game.sprites;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Rectangle;
+
+import g11.mygdx.game.BattleSheep;
 
 public class Sheep extends Sprite{
-    private Rectangle bounds;
-
-    public Sheep (int startX, int startY){
-        this.setPosition(startX,startY);
+    int hitpoints;
+    public Sheep (int width, int height){
         Texture sheep = new Texture("sheep-liten.png");
         this.setTexture(sheep);
-        bounds = new Rectangle(startX, startY, sheep.getWidth(), sheep.getHeight());
+        this.setSize(width, height);
+        this.hitpoints = 4;
     }
 
+    public void gotHit(){
+        hitpoints--;
+
+        if(hitpoints == 0){
+            dead();
+        }
+
+    }
+    public void dead(){
+        this.setSize(BattleSheep.WIDTH / 10*2 - 2, BattleSheep.WIDTH / 10*2 - 2);
+    }
     @Override
     public String toString(){
         return "s";

@@ -9,7 +9,7 @@ public class BattleSheep extends ApplicationAdapter {
 	public static final int WIDTH = 480;
 	public static final int HEIGHT = 800;
 
-	public static final String TITLE = "Helicopter";
+	public static final String TITLE = "BattleSheep";
 	private SpriteBatch batch;
 	private Controller controller;
 	private View view;
@@ -35,5 +35,4 @@ public class BattleSheep extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		view.update(delta);
 	}
-
 }
