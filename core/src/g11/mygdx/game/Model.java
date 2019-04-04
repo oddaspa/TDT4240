@@ -39,6 +39,7 @@ public class Model {
                 this.previousState = this.currentMode;
             }
             this.currentMode = nextState;
+            placeAnimal.setDefaultPosition(); //reset animals in placeAnimalState
 
         }
         if(currentMode.equals("placeAnimalState")){
@@ -55,6 +56,7 @@ public class Model {
                 this.previousState = this.currentMode;
             }
             this.currentMode = nextState;
+            placeAnimal.setDefaultPosition(); //reset animals in placeAnimalState
 
         }
         if(currentMode.equals("confirmationState")) {

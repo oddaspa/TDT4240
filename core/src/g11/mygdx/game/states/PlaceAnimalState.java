@@ -207,7 +207,7 @@ public class PlaceAnimalState implements IState{
         for (int i=65; i<this.placeAnimalSprites.size; i++){
             Sprite animal = this.placeAnimalSprites.get(i);
             if ( selectedAnimal != animal && selectedAnimal.getBoundingRectangle().overlaps(animal.getBoundingRectangle()) ){
-                System.out.println(selectedAnimal + " overlapping " + animal);
+                //System.out.println(selectedAnimal + " overlapping " + animal);
                 selectedAnimal.setPosition(animal.getX(),140);
             }
         }
@@ -248,17 +248,17 @@ public class PlaceAnimalState implements IState{
     @Override
     public void loadData() {
         Sprite chicken = new Chicken(40,40);
-        chicken.setPosition((1 * BattleSheep.WIDTH / 9) + 10,140);
+        //chicken.setPosition((1 * BattleSheep.WIDTH / 9) + 10,140);
         Sprite chicken2 = new Chicken(40,40);
-        chicken2.setPosition(2 * (BattleSheep.WIDTH / 10) + 10,140);
+        //chicken2.setPosition(2 * (BattleSheep.WIDTH / 10) + 10,140);
         Sprite chicken3 = new Chicken(40,40);
-        chicken3.setPosition(3 * (BattleSheep.WIDTH / 10) + 10,140);
+        //chicken3.setPosition(3 * (BattleSheep.WIDTH / 10) + 10,140);
         Sprite sheep = new Sheep(101,75);
-        sheep.setPosition(4 * (BattleSheep.WIDTH / 10), 140);
+        //sheep.setPosition(4 * (BattleSheep.WIDTH / 10), 140);
         Sprite sheep2 = new Sheep(101,75);
-        sheep2.setPosition(6 * (BattleSheep.WIDTH / 10) - 10 ,140);
+        //sheep2.setPosition(6 * (BattleSheep.WIDTH / 10) - 10 ,140);
         Sprite sheep3 = new Sheep(101,75);
-        sheep3.setPosition(7 * (BattleSheep.WIDTH / 10) + 30 ,140);
+        //sheep3.setPosition(7 * (BattleSheep.WIDTH / 10) + 30 ,140);
         Sprite farmer = new Sprite();
         farmer.setTexture(new Texture("bonde-liten.png"));
         farmer.setPosition(5,150);
@@ -284,7 +284,16 @@ public class PlaceAnimalState implements IState{
         this.placeAnimalMessages.add("     Place Your Animals");
         this.placeAnimalMessages.add("");
         this.placeAnimalMessages.add("");
+        setDefaultPosition();
     }
+public void setDefaultPosition() {
+        //          s , s , s , c , c , c
+        int[] x = {370,280,190,150,105,60};
 
+        for (int i = 65; i < this.placeAnimalSprites.size; i++) {
+            Sprite animal = this.placeAnimalSprites.get(i);
+            animal.setPosition(x[placeAnimalSprites.size-i-1],140);
+        }
+}
 
 }
