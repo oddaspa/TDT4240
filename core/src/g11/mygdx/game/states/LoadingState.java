@@ -1,26 +1,29 @@
 package g11.mygdx.game.states;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
 import g11.mygdx.game.BattleSheep;
-import g11.mygdx.game.sprites.Animation;
 import g11.mygdx.game.sprites.Chicken;
 
 public class LoadingState implements IState {
     private Array<Sprite> loadingSprites;
     private Array<String> loadingMessages;
     private Chicken chicken;
-
+    private long startTime;
     public LoadingState(){
+        startTime = System.currentTimeMillis();
+
         this.loadingSprites = new Array<Sprite>();
         this.loadingMessages = new Array<String>();
         loadData();
     }
     @Override
     public String parseInput(float[] data) {
+        if(((System.currentTimeMillis() - startTime) / 1000) > 3){
+            return "menuState";
+        }
+
         return "loadingState";
     }
 

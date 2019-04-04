@@ -21,7 +21,6 @@ public class Chicken extends Sprite{
         this.setSize(width, height);
         this.flip = true;
         this.stepCount = 0;
-        System.out.println("Chicken made!");
     }
 
     public void update(float dt) {

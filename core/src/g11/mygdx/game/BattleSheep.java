@@ -33,6 +33,6 @@ public class BattleSheep extends ApplicationAdapter {
 	@Override
 	public void render () {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		view.update(delta);
+		view.update(delta + 1);
 	}
 }

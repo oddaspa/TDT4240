@@ -223,7 +223,6 @@ public class InGameState implements IState {
                 k++;
                 continue;
             }
-            System.out.println(s);
             for (char c : s.toCharArray()) {
                 if (c == 'x') {
                     // Chicken
