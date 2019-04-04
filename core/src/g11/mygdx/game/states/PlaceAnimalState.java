@@ -62,6 +62,10 @@ public class PlaceAnimalState implements IState{
         } else if (this.playButton.isClicked(data[0], data[1])) {
             return this.goToGame();
         }
+        else if (data[0]<55 && data[1]<55){
+            this.randomPlacing();
+
+        }
         else {
             boolean touched = false;
             Sprite newSelectedAnimal = null;
@@ -164,7 +168,7 @@ public class PlaceAnimalState implements IState{
         } else if (selectedAnimal.getX() < 37) {
             selectedAnimal.setPosition(37,selectedAnimal.getY());
         }
-        if (selectedAnimal.getY() > 635) {
+        if (selectedAnimal.getY() > 620) {
             if (selectedAnimal instanceof Sheep){
                 selectedAnimal.setPosition(selectedAnimal.getX(),585);
             } else {
@@ -177,7 +181,7 @@ public class PlaceAnimalState implements IState{
             Sprite grassCell = this.placeAnimalSprites.get(i);
             int offset = (int)grassCell.getHeight()/2;
             if (selectedAnimal.getX() + offset >= grassCell.getX() && selectedAnimal.getX() + offset <= grassCell.getX() + grassCell.getWidth() + 2) {
-                if (selectedAnimal.getY() + 10 >= grassCell.getY() && selectedAnimal.getY() + 10 <= grassCell.getY() + grassCell.getHeight()){
+                if (selectedAnimal.getY() + 10 >= grassCell.getY() && selectedAnimal.getY() + 8 <= grassCell.getY() + grassCell.getHeight()){
 
                     if (selectedAnimal instanceof Sheep){
                         selectedAnimal.setPosition(grassCell.getX(), grassCell.getY() + 15);
@@ -202,6 +206,32 @@ public class PlaceAnimalState implements IState{
         }
     }
 
+    public void randomPlacing(){
+        Random rand = new Random();
+        boolean allAnimalsPlaced = false;
+
+        while (!allAnimalsPlaced) {
+            for (int i = 65; i < this.placeAnimalSprites.size; i++){
+                this.selectedAnimal = this.placeAnimalSprites.get(i);
+                int x = rand.nextInt(450);
+                int y = rand.nextInt(420) + 265;
+                this.selectedAnimal.setPosition(x,y);
+                this.snapOnGrid();
+            }
+            boolean checkall = true;
+            int misses = 0;
+            for (int j = 65; j < this.placeAnimalSprites.size; j++){
+                if (this.placeAnimalSprites.get(j).getY() < 221){
+                    checkall = false;
+                    misses++;
+
+                }
+            }
+            System.out.println("miss count: "+misses);
+            allAnimalsPlaced = checkall;
+        }
+    }
+
     @Override
     public Array<String> serveMessages() {
         return this.placeAnimalMessages;
@@ -222,11 +252,11 @@ public class PlaceAnimalState implements IState{
         chicken2.setPosition(2 * (BattleSheep.WIDTH / 10) + 10,140);
         Sprite chicken3 = new Chicken(40,40);
         chicken3.setPosition(3 * (BattleSheep.WIDTH / 10) + 10,140);
-        Sprite sheep = new Sheep(100,70);
+        Sprite sheep = new Sheep(101,75);
         sheep.setPosition(4 * (BattleSheep.WIDTH / 10), 140);
-        Sprite sheep2 = new Sheep(100,70);
+        Sprite sheep2 = new Sheep(101,75);
         sheep2.setPosition(6 * (BattleSheep.WIDTH / 10) - 10 ,140);
-        Sprite sheep3 = new Sheep(100,70);
+        Sprite sheep3 = new Sheep(101,75);
         sheep3.setPosition(7 * (BattleSheep.WIDTH / 10) + 30 ,140);
         Sprite farmer = new Sprite();
         farmer.setTexture(new Texture("bonde-liten.png"));
