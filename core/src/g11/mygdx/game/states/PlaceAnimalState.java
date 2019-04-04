@@ -41,6 +41,7 @@ public class PlaceAnimalState implements IState{
         Sprite playButtonSprite = new Sprite(playButtonTexture, playButtonTexture.getWidth() / 2, homeButtonTexture.getHeight() / 6);
         this.playButton = new PlayButton(playButtonSprite, BattleSheep.WIDTH - 10 - playButtonSprite.getWidth(), BattleSheep.HEIGHT - 10 - playButtonSprite.getHeight());
 
+
         loadData();
 
         this.allData.addAll(placeAnimalSprites);
@@ -216,15 +217,17 @@ public class PlaceAnimalState implements IState{
     @Override
     public void loadData() {
         Sprite chicken = new Chicken(40,40);
-        chicken.setPosition((2 * BattleSheep.WIDTH / 9),140);
+        chicken.setPosition((1 * BattleSheep.WIDTH / 9) + 10,140);
         Sprite chicken2 = new Chicken(40,40);
-        chicken2.setPosition(3 * (BattleSheep.WIDTH / 9),140);
+        chicken2.setPosition(2 * (BattleSheep.WIDTH / 10) + 10,140);
         Sprite chicken3 = new Chicken(40,40);
-        chicken3.setPosition(4 * (BattleSheep.WIDTH / 9),140);
+        chicken3.setPosition(3 * (BattleSheep.WIDTH / 10) + 10,140);
         Sprite sheep = new Sheep(100,70);
-        sheep.setPosition(5 * (BattleSheep.WIDTH / 9), 140);
+        sheep.setPosition(4 * (BattleSheep.WIDTH / 10), 140);
         Sprite sheep2 = new Sheep(100,70);
-        sheep2.setPosition(7 * (BattleSheep.WIDTH / 9) -10 ,140);
+        sheep2.setPosition(6 * (BattleSheep.WIDTH / 10) - 10 ,140);
+        Sprite sheep3 = new Sheep(100,70);
+        sheep3.setPosition(7 * (BattleSheep.WIDTH / 10) + 30 ,140);
         Sprite farmer = new Sprite();
         farmer.setTexture(new Texture("bonde-liten.png"));
         farmer.setPosition(5,150);
@@ -246,6 +249,7 @@ public class PlaceAnimalState implements IState{
         this.placeAnimalSprites.add(chicken3);
         this.placeAnimalSprites.add(sheep);
         this.placeAnimalSprites.add(sheep2);
+        this.placeAnimalSprites.add(sheep3);
         this.placeAnimalMessages.add("     Place Your Animals");
         this.placeAnimalMessages.add("");
         this.placeAnimalMessages.add("");
