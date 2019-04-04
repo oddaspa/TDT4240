@@ -24,8 +24,10 @@ public class PlaceAnimalState implements IState{
     private Array<String> placeAnimalMessages;
     private HomeButton homeButton;
     private PlayButton playButton;
+    private PlayButton randButton;
     private Sprite selectedAnimal;
     private Array<Sprite> allData;
+    private Random rand = new Random();
 
     public PlaceAnimalState(){
         this.placeAnimalSprites = new Array<Sprite>();
@@ -39,14 +41,18 @@ public class PlaceAnimalState implements IState{
 
         Texture playButtonTexture = new Texture("play.png");
         Sprite playButtonSprite = new Sprite(playButtonTexture, playButtonTexture.getWidth() / 2, homeButtonTexture.getHeight() / 6);
-        this.playButton = new PlayButton(playButtonSprite, BattleSheep.WIDTH - 10 - playButtonSprite.getWidth(), BattleSheep.HEIGHT - 10 - playButtonSprite.getHeight());
+        this.playButton = new PlayButton(playButtonSprite, BattleSheep.WIDTH - 10 - playButtonSprite.getWidth(), BattleSheep.HEIGHT - 10 - homeButtonSprite.getHeight());
 
+        Texture randomizeButtonTexture = new Texture("play.png");
+        Sprite randomizeButtonSprite = new Sprite(randomizeButtonTexture, randomizeButtonTexture.getWidth() / 2, homeButtonTexture.getHeight() / 6);
+        this.randButton = new PlayButton(randomizeButtonSprite, 200, 10);
 
         loadData();
 
         this.allData.addAll(placeAnimalSprites);
         this.allData.add(playButton.getButton());
         this.allData.add(homeButton.getButton());
+        this.allData.add(randButton.getButton());
 
     }
 
@@ -62,7 +68,7 @@ public class PlaceAnimalState implements IState{
         } else if (this.playButton.isClicked(data[0], data[1])) {
             return this.goToGame();
         }
-        else if (data[0]<55 && data[1]<55){
+        else if ( randButton.isClicked(data[0], data[1]) ){
             this.randomPlacing();
 
         }
@@ -108,8 +114,9 @@ public class PlaceAnimalState implements IState{
             this.turnBoardToFile();
             return "inGameStatus";
         }else{
-            this.placeAnimalMessages.removeIndex(2);
-            placeAnimalMessages.add("Place all animals to continue");
+            this.placeAnimalMessages.removeIndex(0);
+            placeAnimalMessages.add("Place all animals to continue..");
+            placeAnimalMessages.reverse();
             return "placeAnimalState";
         }
     }
@@ -207,7 +214,6 @@ public class PlaceAnimalState implements IState{
     }
 
     public void randomPlacing(){
-        Random rand = new Random();
         boolean allAnimalsPlaced = false;
 
         while (!allAnimalsPlaced) {
@@ -219,15 +225,11 @@ public class PlaceAnimalState implements IState{
                 this.snapOnGrid();
             }
             boolean checkall = true;
-            int misses = 0;
             for (int j = 65; j < this.placeAnimalSprites.size; j++){
                 if (this.placeAnimalSprites.get(j).getY() < 221){
                     checkall = false;
-                    misses++;
-
                 }
             }
-            System.out.println("miss count: "+misses);
             allAnimalsPlaced = checkall;
         }
     }
@@ -239,7 +241,6 @@ public class PlaceAnimalState implements IState{
 
     @Override
     public Array<Sprite> serveData() {
-
         allData.add(this.homeButton.getButton());
         return allData;
     }
