@@ -85,8 +85,9 @@ public class Model {
             return this.menu.serveData();
         }
 
-        if(currentMode.equals("loadingState")){
+        if(currentMode.equals("loadingState")) {
             return this.loading.serveData();
+        }
 
         if (this.currentMode.equals("confirmationState")) {
             return this.confirmationState.serveData();
