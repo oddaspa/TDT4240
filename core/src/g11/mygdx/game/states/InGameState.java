@@ -21,8 +21,8 @@ public class InGameState implements IState {
     private HomeButton homeButton;
     private double col = 0;
     private double row = 0;
-    private float LEFTBORDER = 1 + BattleSheep.WIDTH / 20;
-    private float RIGHTBOARDER = 8 * BattleSheep.WIDTH / 10 + 1 + BattleSheep.WIDTH / 20;
+    private float LEFTBORDER = 1 + BattleSheep.WIDTH / 10;
+    private float RIGHTBOARDER = 8 * BattleSheep.WIDTH / 10 + 1 + BattleSheep.WIDTH / 10;
     private float TOPBORDER = 8 * BattleSheep.WIDTH / 10 + 1 + 300;
     private float BOTTOMBORDER = 1 + 300;
     float[] formerData;
@@ -35,9 +35,8 @@ public class InGameState implements IState {
         this.allSprites = new Array<Sprite>();
         this.inGameMessages = new Array<String>();
         loadData();
-        allSprites = this.opponentBoard;
-        allSprites.addAll(grassTiles);
-        System.out.println(this.opponentBoard.size);
+        allSprites = this.grassTiles;
+        allSprites.addAll(opponentBoard);
         this.formerData = new float[2];
         Texture homeButtonTexture = new Texture("home.png");
         Sprite homeButtonSprite = new Sprite(homeButtonTexture, homeButtonTexture.getWidth() / 6, homeButtonTexture.getHeight() / 6);
@@ -55,6 +54,7 @@ public class InGameState implements IState {
         else if (this.homeButton.isClicked(data[0], data[1])) {
             return "confirmationState";
         }
+
         formerData = data;
         float[] spritePosition = new float[2];
         float spriteX;
@@ -72,6 +72,9 @@ public class InGameState implements IState {
                     if(coordinates[0] == spriteCoordinates[0] && coordinates[1] == spriteCoordinates[1]){
                         if(c instanceof Grass) {
                             Sprite newSprite= ((Grass) c).gotHit();
+                            if(newSprite == null){
+                                continue;
+                            }
                             this.opponentBoard.add(newSprite);
                             if(((Grass) c).hasAnimal()) {
                                 Sprite animal = ((Grass) c).getAnimal();
@@ -225,20 +228,20 @@ public class InGameState implements IState {
                 if (c == 'x') {
                     // Chicken
                     Chicken chicken = new Chicken(0, 0);
-                    chicken.setPosition(j * BattleSheep.WIDTH / 10 + 1 + BattleSheep.WIDTH / 20, i * BattleSheep.WIDTH / 10 + 1 + 300);
+                    chicken.setPosition(j * (BattleSheep.WIDTH / 10) + 1 + (BattleSheep.WIDTH / 10), (i - 1) * (BattleSheep.WIDTH / 10) + 1 + 300);
                     this.opponentBoard.add(chicken);
-                    ((Grass) getGrassTile(j+1,i+1)).setAnimal(chicken);
+                    ((Grass) getGrassTile(j + 1,i)).setAnimal(chicken);
                 }
                 if (c == 'b' && formerRow.toCharArray()[j] == 'b') {
                     if (formerLetter == 'b') {
                         formerLetter = '.';
                         Sheep sheep = new Sheep(0, 0);
-                        sheep.setPosition(j - 1 + 1 * BattleSheep.WIDTH / 10 + 1 + BattleSheep.WIDTH / 20, i * BattleSheep.WIDTH / 10 + 1 + 300);
+                        sheep.setPosition((j - 1) * (BattleSheep.WIDTH / 10) + 1 + (BattleSheep.WIDTH / 10), (i - 1) * BattleSheep.WIDTH / 10 + 1 + 300);
                         this.opponentBoard.add(sheep);
-                        ((Grass) getGrassTile(j+1,i+1)).setAnimal(sheep);
+                        ((Grass) getGrassTile(j+1,i)).setAnimal(sheep);
+                        ((Grass) getGrassTile(j,i)).setAnimal(sheep);
                         ((Grass) getGrassTile(j,i+1)).setAnimal(sheep);
-                        ((Grass) getGrassTile(j,i+2)).setAnimal(sheep);
-                        ((Grass) getGrassTile(j+1,i+2)).setAnimal(sheep);
+                        ((Grass) getGrassTile(j+1,i+1)).setAnimal(sheep);
 
                     }else {
                         formerLetter = 'b';
@@ -261,7 +264,7 @@ public class InGameState implements IState {
                 // Grass underneath
                 Grass grass = new Grass();
                 grass.setSize(BattleSheep.WIDTH / 10 - 2, BattleSheep.WIDTH / 10 - 2);
-                grass.setPosition(j * BattleSheep.WIDTH / 10 + 1 + BattleSheep.WIDTH / 20, i * BattleSheep.WIDTH / 10 + 1 + 300);
+                grass.setPosition(j * BattleSheep.WIDTH / 10 + 1 + BattleSheep.WIDTH / 10, i * BattleSheep.WIDTH / 10 + 1 + 300);
                 this.grassTiles.add(grass);
             }
         }
@@ -273,14 +276,10 @@ public class InGameState implements IState {
             tilePos[0] = g.getX() + g.getWidth()/2;
             tilePos[1] = g.getY() + g.getHeight()/2;
             double[] position= parsePosition(tilePos);
-            System.out.println("Pos - Col: " + position[0] + ", Row: " + position[1]);
-            System.out.println("Coo - Col: " + (double) col + ", Row: " + (double) row);
             if(position[0] == (double) col &&  position[1] == (double) row){
-                System.out.println("found grass tile");
                 return g;
             }
         }
-        System.out.println("found no grass");
         return null;
     }
 }

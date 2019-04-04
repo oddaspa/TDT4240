@@ -15,7 +15,6 @@ public class Chicken extends Sprite{
     }
 
     public void gotHit(){
-        System.out.println("chicken got hit");
         this.setSize(BattleSheep.WIDTH / 10 - 2, BattleSheep.WIDTH / 10 - 2);
     }
 

@@ -16,10 +16,8 @@ public class Sheep extends Sprite{
 
     public void gotHit(){
         hitpoints--;
-        System.out.println("sheep got hit");
 
         if(hitpoints == 0){
-            System.out.println("sheep dead");
             dead();
         }
 
