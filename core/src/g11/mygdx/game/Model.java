@@ -6,11 +6,13 @@ import com.badlogic.gdx.utils.Array;
 import g11.mygdx.game.states.ConfirmationState;
 import g11.mygdx.game.states.InGameState;
 import g11.mygdx.game.states.MenuState;
+import g11.mygdx.game.states.LoadingState;
 import g11.mygdx.game.states.PlaceAnimalState;
 
 public class Model {
     private String currentMode;
     private MenuState menu;
+    private LoadingState loading;
     private PlaceAnimalState placeAnimal;
     private InGameState inGameState;
     private ConfirmationState confirmationState;
@@ -20,6 +22,7 @@ public class Model {
 
     public Model(){
         this.menu = new MenuState();
+        this.loading = new LoadingState();
         this.placeAnimal = new PlaceAnimalState();
         this.inGameState = new InGameState();
         this.previousState = "menuState";
@@ -41,6 +44,9 @@ public class Model {
             this.currentMode = nextState;
             placeAnimal.setDefaultPosition(); //reset animals in placeAnimalState
 
+        }
+        if(currentMode.equals("loadingState")){
+            this.currentMode = this.loading.parseInput(data);
         }
         if(currentMode.equals("placeAnimalState")){
             nextState = this.placeAnimal.parseInput(data);
@@ -78,8 +84,13 @@ public class Model {
         if(this.currentMode.equals("menuState")){
             return this.menu.serveData();
         }
+
+        if(currentMode.equals("loadingState")){
+            return this.loading.serveData();
+
         if (this.currentMode.equals("confirmationState")) {
             return this.confirmationState.serveData();
+
         }
         if(currentMode.equals("inGameStatus")){
             return this.inGameState.serveData();

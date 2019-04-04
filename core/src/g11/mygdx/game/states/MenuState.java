@@ -30,6 +30,7 @@ public class MenuState implements IState {
                 if(data[0] > button.getX() && data[0] < button.getX() + button.getWidth()){
                     return "placeAnimalState";
                 }
+
             }
         }
         return "menuState";
