@@ -23,8 +23,8 @@ public class Grass extends Sprite{
     public Sprite gotHit(){
         if(hasAnimal){
             Texture tex = new Texture("blood-1.png");
-            Sprite blood = new Sprite(tex, (int) this.getWidth(), (int) this.getHeight());
-            blood.setPosition(this.getX(), this.getY());
+            Sprite blood = new Sprite(tex, (int) this.getWidth()/2, (int) this.getHeight()/2);
+            blood.setPosition(this.getX()+this.getWidth()/4, this.getY()+this.getHeight()/4);
             this.animal.setAlpha(1f);
             return blood;
         } else {
@@ -46,7 +46,9 @@ public class Grass extends Sprite{
         this.animal = animal;
     }
 
-
+    public boolean hasAnimal(){
+        return hasAnimal;
+    }
     public Sprite getAnimal(){
         return this.animal;
     }
