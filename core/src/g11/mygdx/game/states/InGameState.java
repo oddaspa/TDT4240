@@ -86,12 +86,13 @@ public class InGameState implements IState {
                                 }
                             }
                         }
-
+                        makeMove((int) coordinates[0], (int) coordinates[1]);
                     }
 
                 }
             }
         }
+
         return "inGameStatus";
     }
 
@@ -145,10 +146,20 @@ public class InGameState implements IState {
         FileHandle handle = Gdx.files.local(file);
         String text = handle.readString();
         String wordsArray[] = text.split("\\r?\\n");
-        wordsArray[row].toCharArray()[col] = item;
-        for(String s : wordsArray){
-            handle.writeString(s, false);
+        String returnArray[] = wordsArray;
+        handle.writeString("", false);
+        int i = 9;
+        for(String s : returnArray){
+            if(i == row){
+                char[] ch = s.toCharArray();
+                ch[col-1] = item;
+                s = String.valueOf(ch);
+            }
+            handle.writeString(s, true);
+            handle.writeString("\n", true);
+            i--;
         }
+
 
     }
 
@@ -280,5 +291,26 @@ public class InGameState implements IState {
             }
         }
         return null;
+    }
+
+    public void makeMove(int col, int row){
+        writeFile("oppBoard.txt", col, row, 'X');
+        System.out.println("make move");
+        if(gameFinished("oppBoard.txt")){
+            System.out.println("You won!");
+        }
+
+    }
+
+    public boolean gameFinished(String file) {
+        String[] fromFile = readFile(file);
+        for (String s : fromFile) {
+            for (char c : s.toCharArray()) {
+                if (c == 'x' || c == 'b') {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
