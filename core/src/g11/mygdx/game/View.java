@@ -35,8 +35,15 @@ public class View extends Screen {
     public void handleInput() {
         if (Gdx.input.isTouched()) {
             Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+            touchPos = cam.unproject(touchPos);
             gx = touchPos.x;
-            gy = BattleSheep.HEIGHT - touchPos.y;
+            gy = touchPos.y;
+            gx += 1;
+            gy += 1;
+            gy = gy * 400;
+            gx = gx * 240;
+
+
             float[] coordinates = new float[2];
             coordinates[0] = gx;
             coordinates[1] = gy;
@@ -69,6 +76,11 @@ public class View extends Screen {
             font.draw(sb, msgs.get(2),10, 40);
         }
         sb.end();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        gamePort.update(width, height);
     }
 
     @Override

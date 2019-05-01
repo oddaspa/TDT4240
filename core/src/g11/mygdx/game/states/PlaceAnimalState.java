@@ -145,6 +145,7 @@ public class PlaceAnimalState implements IState{
             boardRow = new String(result);
             board += boardRow + "\n";
         }
+        
         FileHandle handle = Gdx.files.local("myBoard.txt");
         String text = handle.readString();
         String fileRowArray[] = text.split("\\r?\\n");
