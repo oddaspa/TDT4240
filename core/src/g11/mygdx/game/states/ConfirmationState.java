@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Array;
 
+import g11.mygdx.game.BattleSheep;
 import g11.mygdx.game.modules.Button;
 import g11.mygdx.game.modules.NoButton;
 import g11.mygdx.game.modules.YesButton;
@@ -25,12 +26,13 @@ public class ConfirmationState implements IState {
         Texture confirmationScreenTexture = new Texture("confirmation.png");
         this.confirmationScreen = new Sprite(confirmationScreenTexture);
         this.confirmationScreen.setPosition(0,0);
+        this.confirmationScreen.setSize(BattleSheep.WIDTH, BattleSheep.HEIGHT);
 
         Texture yesTexture = new Texture("yes_button.png");
-        this.yesButton = new YesButton(new Sprite(yesTexture), (confirmationScreen.getWidth() / 2) - (yesTexture.getWidth() / 2), 100);
 
+        this.yesButton = new YesButton(new Sprite(yesTexture), (confirmationScreen.getWidth() / 2) - (BattleSheep.WIDTH / 3), BattleSheep.HEIGHT / 8);
         Texture noTexture = new Texture("no_button.png");
-        this.noButton = new NoButton(new Sprite(noTexture), (confirmationScreen.getWidth() / 2) - (yesTexture.getWidth() / 2), 240);
+        this.noButton = new NoButton(new Sprite(noTexture), (confirmationScreen.getWidth() / 2) - (BattleSheep.WIDTH / 3), (float) (BattleSheep.HEIGHT * 0.3));
 
         this.sprites.add(confirmationScreen);
         this.sprites.add(yesButton.getButton());

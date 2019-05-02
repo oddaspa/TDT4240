@@ -1,13 +1,19 @@
 package g11.mygdx.game;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class BattleSheep extends Game {
-	public static final int WIDTH = 480;
-	public static final int HEIGHT = 800;
+
+	public static int WIDTH = 480;
+	public static int HEIGHT = 800;
+
+	public static final int VIRTUAL_WIDTH = 480;
+	public static final int VIRTUAL_HEIGHT = 800;
+	public static final float ASPECT_RATIO = (float) VIRTUAL_WIDTH / (float) VIRTUAL_HEIGHT;
 
 	private PlayServices ply;
 	public static final String TITLE = "BattleSheep";
@@ -20,9 +26,13 @@ public class BattleSheep extends Game {
 
     @Override
 	public void create () {
-
+		if(Gdx.app.getType() == Application.ApplicationType.Android) {
+			// android specific code
+			BattleSheep.WIDTH = 1080;
+			BattleSheep.HEIGHT = 1920;
+		}
 		batch = new SpriteBatch();
-		Gdx.gl.glClearColor(194/255f, 225/255f, 157/255f, 1);
+		//Gdx.gl.glClearColor(194/255f, 225/255f, 157/255f, 1);
 		delta = Gdx.graphics.getDeltaTime();
 		model = new Model();
 		view = new View(batch);

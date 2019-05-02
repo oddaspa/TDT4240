@@ -8,8 +8,8 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		DummyPlayServices dumdum = new DummyPlayServices();
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.width = BattleSheep.WIDTH;
-		config.height = BattleSheep.HEIGHT;
+		config.width = 480;
+		config.height = 800;
 		config.title = BattleSheep.TITLE;
 		new LwjglApplication(new BattleSheep(dumdum), config);
 	}

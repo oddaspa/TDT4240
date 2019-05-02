@@ -67,6 +67,8 @@ project(":android") {
         implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
         implementation "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-gpgs:$gamesvcsVersion"
         implementation "com.google.android.gms:play-services-games:17.0.0"
+        implementation 'com.google.android.gms:play-services-auth:16.0.1'
+
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"

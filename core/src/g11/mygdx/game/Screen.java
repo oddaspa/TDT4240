@@ -16,10 +16,11 @@ public abstract class Screen {
     protected Viewport gamePort;
 
     protected Screen(SpriteBatch batch){
-        sb = batch;
-        cam = new OrthographicCamera();
-        gamePort = new FitViewport(1920, 1080, cam);
+        cam = new OrthographicCamera(BattleSheep.WIDTH, BattleSheep.HEIGHT);
+        gamePort = new FitViewport(480, 800, cam);
         mouse = new Vector3();
+        cam.update();
+        sb = batch;
 
     }
     protected  abstract void handleInput();

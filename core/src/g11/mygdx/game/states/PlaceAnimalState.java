@@ -33,16 +33,16 @@ public class PlaceAnimalState implements IState{
         this.selectedAnimal = null;
 
         Texture homeButtonTexture = new Texture("home.png");
-        Sprite homeButtonSprite = new Sprite(homeButtonTexture, homeButtonTexture.getWidth() / 6, homeButtonTexture.getHeight() / 6);
-        this.homeButton = new HomeButton(homeButtonSprite, (float) 10, (float) BattleSheep.HEIGHT - 10 - homeButtonSprite.getHeight());
+        Sprite homeButtonSprite = new Sprite(homeButtonTexture, BattleSheep.WIDTH / 10, BattleSheep.WIDTH / 10);
+        this.homeButton = new HomeButton(homeButtonSprite, (float) BattleSheep.WIDTH / 48, (float) BattleSheep.HEIGHT - BattleSheep.HEIGHT / 80 - homeButtonSprite.getHeight());
 
         Texture playButtonTexture = new Texture("play.png");
-        Sprite playButtonSprite = new Sprite(playButtonTexture, playButtonTexture.getWidth() / 2, homeButtonTexture.getHeight() / 6);
-        this.playButton = new PlayButton(playButtonSprite, BattleSheep.WIDTH - 10 - playButtonSprite.getWidth(), BattleSheep.HEIGHT - 10 - homeButtonSprite.getHeight());
+        Sprite playButtonSprite = new Sprite(playButtonTexture, BattleSheep.WIDTH / 2, BattleSheep.WIDTH / 10);
+        this.playButton = new PlayButton(playButtonSprite, BattleSheep.WIDTH - BattleSheep.WIDTH / 48 - playButtonSprite.getWidth(), BattleSheep.HEIGHT - BattleSheep.HEIGHT / 80 - homeButtonSprite.getHeight());
 
         Texture randomizeButtonTexture = new Texture("play.png");
-        Sprite randomizeButtonSprite = new Sprite(randomizeButtonTexture, randomizeButtonTexture.getWidth() / 2, homeButtonTexture.getHeight() / 6);
-        this.randButton = new PlayButton(randomizeButtonSprite, 200, 10);
+        Sprite randomizeButtonSprite = new Sprite(randomizeButtonTexture, BattleSheep.WIDTH / 2, BattleSheep.WIDTH / 10);
+        this.randButton = new PlayButton(randomizeButtonSprite, BattleSheep.WIDTH / 2 - randomizeButtonSprite.getWidth() / 2, BattleSheep.HEIGHT / 80);
 
         loadData();
 
@@ -145,7 +145,7 @@ public class PlaceAnimalState implements IState{
             boardRow = new String(result);
             board += boardRow + "\n";
         }
-        
+
         FileHandle handle = Gdx.files.local("myBoard.txt");
         String text = handle.readString();
         String fileRowArray[] = text.split("\\r?\\n");
@@ -164,34 +164,34 @@ public class PlaceAnimalState implements IState{
     }
 
     public void snapOnGrid() {
-        if (selectedAnimal.getX() > 365) {
+        if (selectedAnimal.getX() > BattleSheep.WIDTH * 0.76041) {
             if (selectedAnimal instanceof Sheep){
-                selectedAnimal.setPosition(365,selectedAnimal.getY());
+                selectedAnimal.setPosition((float) (BattleSheep.WIDTH * 0.76041),selectedAnimal.getY());
             } else {
-                selectedAnimal.setPosition(408,selectedAnimal.getY());
+                selectedAnimal.setPosition((float) (BattleSheep.WIDTH * 0.85),selectedAnimal.getY());
             }
-        } else if (selectedAnimal.getX() < 37) {
-            selectedAnimal.setPosition(37,selectedAnimal.getY());
+        } else if (selectedAnimal.getX() < BattleSheep.WIDTH * 0.0771) {
+            selectedAnimal.setPosition((float) (BattleSheep.WIDTH * 0.0771),selectedAnimal.getY());
         }
-        if (selectedAnimal.getY() > 620) {
+        if (selectedAnimal.getY() > BattleSheep.HEIGHT * 0.775) {
             if (selectedAnimal instanceof Sheep){
-                selectedAnimal.setPosition(selectedAnimal.getX(),585);
+                selectedAnimal.setPosition(selectedAnimal.getX(), (float) (BattleSheep.HEIGHT * 0.73125));
             } else {
-                selectedAnimal.setPosition(selectedAnimal.getX(),650);
+                selectedAnimal.setPosition(selectedAnimal.getX(), (float) (BattleSheep.HEIGHT * 0.775));
             }
-        } else if (selectedAnimal.getY() < 262 && selectedAnimal.getY() > 220) {
-            selectedAnimal.setPosition(selectedAnimal.getX(),262);
+        } else if (selectedAnimal.getY() < BattleSheep.HEIGHT * 0.3275 && selectedAnimal.getY() > BattleSheep.HEIGHT * 0.275) {
+            selectedAnimal.setPosition(selectedAnimal.getX(), (float) (BattleSheep.HEIGHT * 0.3275));
         }
         for (int i=0; i<65; i++) {
             Sprite grassCell = this.placeAnimalSprites.get(i);
             int offset = (int)grassCell.getHeight()/2;
             if (selectedAnimal.getX() + offset >= grassCell.getX() && selectedAnimal.getX() + offset <= grassCell.getX() + grassCell.getWidth() + 2) {
-                if (selectedAnimal.getY() + 10 >= grassCell.getY() && selectedAnimal.getY() + 8 <= grassCell.getY() + grassCell.getHeight()){
+                if (selectedAnimal.getY() + BattleSheep.HEIGHT / 80 >= grassCell.getY() && selectedAnimal.getY() + BattleSheep.HEIGHT /100 <= grassCell.getY() + grassCell.getHeight()){
 
                     if (selectedAnimal instanceof Sheep){
-                        selectedAnimal.setPosition(grassCell.getX(), grassCell.getY() + 15);
+                        selectedAnimal.setPosition(grassCell.getX(), (float) (grassCell.getY() + BattleSheep.HEIGHT * 0.01875));
                     }else if (selectedAnimal instanceof Chicken){
-                        selectedAnimal.setPosition(grassCell.getX() + 5, grassCell.getY() + 3);
+                        selectedAnimal.setPosition(grassCell.getX() + BattleSheep.WIDTH / 96, (float) (grassCell.getY() + BattleSheep.HEIGHT * 0.00375));
                     }else {
                         selectedAnimal.setPosition(grassCell.getX(), grassCell.getY());
                     }
@@ -206,7 +206,7 @@ public class PlaceAnimalState implements IState{
             Sprite animal = this.placeAnimalSprites.get(i);
             if ( selectedAnimal != animal && selectedAnimal.getBoundingRectangle().overlaps(animal.getBoundingRectangle()) ){
                 //System.out.println(selectedAnimal + " overlapping " + animal);
-                selectedAnimal.setPosition(animal.getX(),140);
+                selectedAnimal.setPosition(animal.getX(), (float) (BattleSheep.HEIGHT * 0.175));
             }
         }
     }
@@ -217,14 +217,14 @@ public class PlaceAnimalState implements IState{
         while (!allAnimalsPlaced) {
             for (int i = 65; i < this.placeAnimalSprites.size; i++){
                 this.selectedAnimal = this.placeAnimalSprites.get(i);
-                int x = rand.nextInt(450);
-                int y = rand.nextInt(420) + 265;
+                int x = rand.nextInt((int) (BattleSheep.WIDTH * 0.9375));
+                int y = (int) (rand.nextInt((int) (BattleSheep.HEIGHT * 0.525)) + BattleSheep.HEIGHT * 0.33125);
                 this.selectedAnimal.setPosition(x,y);
                 this.snapOnGrid();
             }
             boolean checkall = true;
             for (int j = 65; j < this.placeAnimalSprites.size; j++){
-                if (this.placeAnimalSprites.get(j).getY() < 221){
+                if (this.placeAnimalSprites.get(j).getY() < BattleSheep.HEIGHT * 0.27625){
                     checkall = false;
                 }
             }
@@ -245,27 +245,27 @@ public class PlaceAnimalState implements IState{
 
     @Override
     public void loadData() {
-        Sprite chicken = new Chicken(40,40);
+        Sprite chicken = new Chicken(BattleSheep.WIDTH / 12,BattleSheep.WIDTH / 12);
         //chicken.setPosition((1 * BattleSheep.WIDTH / 9) + 10,140);
-        Sprite chicken2 = new Chicken(40,40);
+        Sprite chicken2 = new Chicken(BattleSheep.WIDTH / 12,BattleSheep.WIDTH / 12);
         //chicken2.setPosition(2 * (BattleSheep.WIDTH / 10) + 10,140);
-        Sprite chicken3 = new Chicken(40,40);
+        Sprite chicken3 = new Chicken(BattleSheep.WIDTH / 12,BattleSheep.WIDTH / 12);
         //chicken3.setPosition(3 * (BattleSheep.WIDTH / 10) + 10,140);
-        Sprite sheep = new Sheep(101,75);
+        Sprite sheep = new Sheep((int) (BattleSheep.WIDTH * 0.21), (int) (BattleSheep.HEIGHT * 0.09375));
         //sheep.setPosition(4 * (BattleSheep.WIDTH / 10), 140);
-        Sprite sheep2 = new Sheep(101,75);
+        Sprite sheep2 = new Sheep((int) (BattleSheep.WIDTH * 0.21), (int) (BattleSheep.HEIGHT * 0.09375));
         //sheep2.setPosition(6 * (BattleSheep.WIDTH / 10) - 10 ,140);
-        Sprite sheep3 = new Sheep(101,75);
+        Sprite sheep3 = new Sheep((int) (BattleSheep.WIDTH * 0.21), (int) (BattleSheep.HEIGHT * 0.09375));
         //sheep3.setPosition(7 * (BattleSheep.WIDTH / 10) + 30 ,140);
         Sprite farmer = new Sprite();
         farmer.setTexture(new Texture("bonde-liten.png"));
-        farmer.setPosition(5,150);
-        farmer.setSize(60,120);
+        farmer.setPosition(BattleSheep.WIDTH / 96, (float) (BattleSheep.HEIGHT * 0.1875));
+        farmer.setSize(BattleSheep.WIDTH / 8,(3 * BattleSheep.HEIGHT) / 20);
         //place grass cells
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Sprite grassCell = new Grass();
-                grassCell.setPosition(j * (BattleSheep.WIDTH / 9)+ 1 + 30,i * BattleSheep.WIDTH / 9 + 1 + 260);
+                grassCell.setPosition(j * (BattleSheep.WIDTH / 9)+ 1 + BattleSheep.WIDTH / 16, (float) (i * BattleSheep.WIDTH / 9 + 1 + BattleSheep.HEIGHT * 0.325));
                 grassCell.setSize( BattleSheep.WIDTH / 9 - 2, BattleSheep.WIDTH / 9 - 2);
                 this.placeAnimalSprites.add(grassCell);
             }
@@ -286,11 +286,17 @@ public class PlaceAnimalState implements IState{
     }
 public void setDefaultPosition() {
         //          s , s , s , c , c , c
-        int[] x = {370,280,190,150,105,60};
+        int[] x = {
+                (int) (BattleSheep.WIDTH * 0.77),
+                (int) (BattleSheep.WIDTH * 0.5833),
+                (int) (BattleSheep.WIDTH * 0.3958),
+                (int) (BattleSheep.WIDTH * 0.3125),
+                (int) (BattleSheep.WIDTH * 0.21875),
+                (int) (BattleSheep.WIDTH * 0.125)};
 
         for (int i = 65; i < this.placeAnimalSprites.size; i++) {
             Sprite animal = this.placeAnimalSprites.get(i);
-            animal.setPosition(x[placeAnimalSprites.size-i-1],140);
+            animal.setPosition(x[placeAnimalSprites.size-i-1], (float) (BattleSheep.HEIGHT * 0.175));
         }
 }
 

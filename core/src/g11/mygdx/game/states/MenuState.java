@@ -47,13 +47,22 @@ public class MenuState implements IState {
     @Override
     public void loadData(){
         Texture bg = new Texture("background2.jpg");
+        Sprite background = new Sprite(bg);
+        background.setPosition(0,0);
+        background.setSize(BattleSheep.WIDTH,BattleSheep.HEIGHT);
+
         Texture playBtn = new Texture("quick_game.png");
-        Texture challengeBtn = new Texture("challenge_friend.png");
-        Sprite background = new Sprite(bg, 0,0, BattleSheep.WIDTH, BattleSheep.HEIGHT);
         Sprite startButton = new Sprite(playBtn);
+        startButton.setSize(2 * BattleSheep.WIDTH / 3, BattleSheep.HEIGHT / 4);
+        startButton.setPosition(BattleSheep.WIDTH / 6,(BattleSheep.HEIGHT *2 / 7));
+
+        Texture challengeBtn = new Texture("challenge_friend.png");
         Sprite challengeButton = new Sprite(challengeBtn);
-        startButton.setPosition((BattleSheep.WIDTH / 2) - (playBtn.getWidth() / 2),(BattleSheep.HEIGHT *2 / 7));
-        challengeButton.setPosition((BattleSheep.WIDTH / 2) - (playBtn.getWidth() / 2),(BattleSheep.HEIGHT / 14));
+        challengeButton.setSize(2 * BattleSheep.WIDTH / 3, BattleSheep.HEIGHT / 4);
+
+        challengeButton.setPosition(BattleSheep.WIDTH / 6,(BattleSheep.HEIGHT / 14));
+
+
         this.menuSprites.add(background);
         this.menuSprites.add(startButton);
         this.menuSprites.add(challengeButton);

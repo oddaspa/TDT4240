@@ -13,6 +13,8 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.google.android.gms.games.Games;
 import com.google.example.games.basegameutils.GameHelper;
 
+// NEW STUFF
+
 public class AndroidLauncher extends AndroidApplication implements PlayServices {
 	private final static int requestCode = 1;
 	private GameHelper gameHelper;
@@ -155,4 +157,14 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 	public boolean isSignedIn() {
 		return gameHelper.isSignedIn();
 	}
+
+
+
+
+
+
+
+
+
+
 }
