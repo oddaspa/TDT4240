@@ -28,10 +28,12 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 		GameHelper.GameHelperListener gameHelperListener = new GameHelper.GameHelperListener() {
 			@Override
 			public void onSignInFailed() {
+				Gdx.app.log("onCreate", "Log in failed.");
 			}
 
 			@Override
 			public void onSignInSucceeded() {
+				Gdx.app.log("onCreate", "Log in success.");
 			}
 		};
 
@@ -82,7 +84,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 				}
 			});
 		} catch (Exception e) {
-			//Gdx.app.log("MainActivity", "Log in failed: " + e.getMessage() + ".");
+			Gdx.app.log("MainActivity", "Log in failed: " + e.getMessage() + ".");
 		}
 	}
 
@@ -102,7 +104,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 
 	@Override
 	public void rateGame() {
-
 		String str = "Your PlayStore Link";
 		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(str)));
 	}
@@ -115,14 +116,14 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 	@Override
 	public void submitScore(int highScore) {
 		if (isSignedIn()) {
-			Games.Leaderboards.submitScore(gameHelper.getApiClient(), "CgkIkdTIyacFEAIQAQ", highScore);
+			Games.Leaderboards.submitScore(gameHelper.getApiClient(), "CgkIiJTL5d0KEAIQAQ", highScore);
 		}
 	}
 
 	@Override
 	public void submitLevel(int highLevel) {
 		if (isSignedIn()) {
-			Games.Leaderboards.submitScore(gameHelper.getApiClient(), "CgkIkdTIyacFEAIQAg", highLevel);
+			Games.Leaderboards.submitScore(gameHelper.getApiClient(), "CgkIiJTL5d0KEAIQAQ", highLevel);
 		}
 	}
 
@@ -138,7 +139,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 	@Override
 	public void showScore() {
 		if (isSignedIn()) {
-			startActivityForResult(Games.Leaderboards.getLeaderboardIntent(gameHelper.getApiClient(), "CgkIkdTIyacFEAIQAQ"), requestCode);
+			startActivityForResult(Games.Leaderboards.getLeaderboardIntent(gameHelper.getApiClient(), "CgkIiJTL5d0KEAIQAQ"), requestCode);
 		} else {
 			signIn();
 		}
@@ -147,7 +148,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 	@Override
 	public void showLevel() {
 		if (isSignedIn()) {
-			startActivityForResult(Games.Leaderboards.getLeaderboardIntent(gameHelper.getApiClient(), "CgkIkdTIyacFEAIQAg"), requestCode);
+			startActivityForResult(Games.Leaderboards.getLeaderboardIntent(gameHelper.getApiClient(), "CgkIiJTL5d0KEAIQAQ"), requestCode);
 		} else {
 			signIn();
 		}
