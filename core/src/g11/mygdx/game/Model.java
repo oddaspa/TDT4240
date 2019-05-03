@@ -20,8 +20,8 @@ public class Model {
     private String nextState;
     // MAKE ALL THE STATES
 
-    public Model(){
-        this.menu = new MenuState();
+    public Model(PlayServices actionResolver){
+        this.menu = new MenuState(actionResolver);
         this.loading = new LoadingState();
         this.placeAnimal = new PlaceAnimalState();
         this.inGameState = null;
