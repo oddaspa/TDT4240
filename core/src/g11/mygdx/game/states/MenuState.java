@@ -1,5 +1,6 @@
 package g11.mygdx.game.states;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Array;
@@ -42,7 +43,13 @@ public class MenuState implements IState {
             if(data[1] > button.getY() && data[1] < button.getY() + button.getHeight()){
                 //  X      >   45          &&  X      <       435
                 if(data[0] > button.getX() && data[0] < button.getX() + button.getWidth()){
-                    return "placeAnimalState";
+                    if (action.isSignedIn()) {
+                        action.createMatch();
+                        return "placeAnimalState";
+                    }else {
+                        Gdx.app.log("------> MenuState", "tried to play while signed out");
+                    }
+
                 }
 
             }
@@ -77,15 +84,15 @@ public class MenuState implements IState {
         challengeButton.setPosition(BattleSheep.WIDTH / 6,(BattleSheep.HEIGHT / 14));
 
         // GPGS STUFF
-        Texture signInBtn = new Texture("sign_in_button1.png");
-        Sprite signInButton = new Sprite(signInBtn);
-        signInButton.setSize(BattleSheep.WIDTH / 6, BattleSheep.HEIGHT / 20);
+        Texture signInTex = new Texture("sign_in_button1.png");
+        Sprite signInButton = new Sprite(signInTex);
+        signInButton.setSize(BattleSheep.WIDTH / 4, BattleSheep.HEIGHT / 12);
         this.signIn = new SignInButton(signInButton,0,0);
 
-        Texture signOutBtn = new Texture("sign_out_button1.png");
-        Sprite signOutButton = new Sprite(signOutBtn);
-        signOutButton.setSize(BattleSheep.WIDTH / 8, BattleSheep.HEIGHT / 20);
-        this.signOut = new SignInButton(signOutButton,BattleSheep.WIDTH / 4 + BattleSheep.WIDTH/8,0);
+        Texture signOutTex = new Texture("sign_out_button1.png");
+        Sprite signOutButton = new Sprite(signOutTex);
+        signOutButton.setSize(BattleSheep.WIDTH / 4, BattleSheep.HEIGHT / 12);
+        this.signOut = new SignInButton(signOutButton,BattleSheep.WIDTH - BattleSheep.WIDTH/4,0);
 
         this.menuSprites.add(background);
         this.menuSprites.add(startButton);

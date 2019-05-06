@@ -1,6 +1,6 @@
 android {
     buildToolsVersion '28.0.3'
-    compileSdkVersion 27
+    compileSdkVersion 28
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -17,7 +17,7 @@ android {
         exclude 'META-INF/robovm/ios/robovm.xml'
     }
     defaultConfig {
-        applicationId "g11.mygdx.game"
+        applicationId "progark.battlesheep"
         minSdkVersion 15
         targetSdkVersion 28
         versionCode 1
@@ -84,7 +84,7 @@ task run(type: Exec) {
     }
 
     def adb = path + "/platform-tools/adb"
-    commandLine "$adb", 'shell', 'am', 'start', '-n', 'g11.mygdx.game/g11.mygdx.game.AndroidLauncher'
+    commandLine "$adb", 'shell', 'am', 'start', '-n', 'g11.mygdx.game/g11.mygdx.game.MainActivity'
 }
 // sets up the Android Eclipse project, using the old Ant based build.
 eclipse {

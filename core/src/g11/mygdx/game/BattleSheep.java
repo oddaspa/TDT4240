@@ -38,7 +38,7 @@ public class BattleSheep extends ApplicationAdapter {
 		}
 		localActionActionResolver.signIn();
 
-        delta = Gdx.graphics.getDeltaTime();
+		delta = Gdx.graphics.getDeltaTime();
 		Gdx.app.setLogLevel(Application.LOG_DEBUG);
 
 		batch = new SpriteBatch();

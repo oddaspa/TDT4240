@@ -173,7 +173,7 @@ public class PlaceAnimalState implements IState{
         } else if (selectedAnimal.getX() < BattleSheep.WIDTH * 0.0771) {
             selectedAnimal.setPosition((float) (BattleSheep.WIDTH * 0.0771),selectedAnimal.getY());
         }
-        if (selectedAnimal.getY() > BattleSheep.HEIGHT * 0.775) {
+        if (selectedAnimal.getY() > BattleSheep.HEIGHT * 0.75) {
             if (selectedAnimal instanceof Sheep){
                 selectedAnimal.setPosition(selectedAnimal.getX(), (float) (BattleSheep.HEIGHT * 0.73125));
             } else {
