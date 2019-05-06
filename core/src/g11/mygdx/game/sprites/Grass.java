@@ -1,5 +1,7 @@
 package g11.mygdx.game.sprites;
 
+import android.support.annotation.RequiresApi;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import java.util.concurrent.ThreadLocalRandom;
@@ -45,7 +47,6 @@ public class Grass extends Sprite{
     public String toString(){
         return ".";
     }
-
 
     public void setAnimal(Sprite animal){
         this.hasAnimal = true;

@@ -14,6 +14,8 @@ public class MenuState implements IState {
     private Array<Sprite> menuSprites;
     private Button signIn;
     private Button signOut;
+    private Button quickGame;
+    private Button matchMaking;
     private PlayServices action;
     // MAKE ALL THE STATES
 
@@ -35,18 +37,17 @@ public class MenuState implements IState {
             action.signOut();
             return "menuState";
         }
-
-        else{
-            Sprite button = this.menuSprites.get(1);
-            //      Y  >      400      &&  Y      <       570
-            if(data[1] > button.getY() && data[1] < button.getY() + button.getHeight()){
-                //  X      >   45          &&  X      <       435
-                if(data[0] > button.getX() && data[0] < button.getX() + button.getWidth()){
-                    return "placeAnimalState";
-                }
-
-            }
+        if (this.quickGame.isClicked(data[0], data[1])){
+            this.action.onQuickMatchClicked();
+            return "placeAnimalState";
         }
+
+        if (this.matchMaking.isClicked(data[0], data[1])){
+            action.unlockAchievement("CgkIiJTL5d0KEAIQBA");
+            //action.onQuickMatchClicked();
+            return "menuState";
+        }
+
         return "menuState";
     }
     @Override
@@ -64,17 +65,17 @@ public class MenuState implements IState {
         Sprite background = new Sprite(bg);
         background.setPosition(0,0);
         background.setSize(BattleSheep.WIDTH,BattleSheep.HEIGHT);
-
+        /*
         Texture playBtn = new Texture("quick_game.png");
         Sprite startButton = new Sprite(playBtn);
         startButton.setSize(2 * BattleSheep.WIDTH / 3, BattleSheep.HEIGHT / 4);
         startButton.setPosition(BattleSheep.WIDTH / 6,(BattleSheep.HEIGHT *2 / 7));
-
+        */
         Texture challengeBtn = new Texture("challenge_friend.png");
         Sprite challengeButton = new Sprite(challengeBtn);
         challengeButton.setSize(2 * BattleSheep.WIDTH / 3, BattleSheep.HEIGHT / 4);
+        this.matchMaking = new SignInButton(challengeButton, BattleSheep.WIDTH / 6, BattleSheep.HEIGHT / 14);
 
-        challengeButton.setPosition(BattleSheep.WIDTH / 6,(BattleSheep.HEIGHT / 14));
 
         // GPGS STUFF
         Texture signInTex = new Texture("sign_in_button1.png");
@@ -87,8 +88,13 @@ public class MenuState implements IState {
         signOutButton.setSize(BattleSheep.WIDTH / 4, BattleSheep.HEIGHT / 12);
         this.signOut = new SignInButton(signOutButton,BattleSheep.WIDTH - BattleSheep.WIDTH/4,0);
 
+        Texture quickTex = new Texture("quick_game.png");
+        Sprite quickGameButton = new Sprite(quickTex);
+        quickGameButton.setSize(2 * BattleSheep.WIDTH / 3, BattleSheep.HEIGHT / 4);
+        this.quickGame = new SignInButton(quickGameButton,BattleSheep.WIDTH / 6, (BattleSheep.HEIGHT *2 / 7));
+
         this.menuSprites.add(background);
-        this.menuSprites.add(startButton);
+        this.menuSprites.add(quickGameButton);
         this.menuSprites.add(challengeButton);
 
         this.menuSprites.add(signInButton);

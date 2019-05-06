@@ -1,7 +1,5 @@
 package g11.mygdx.game.states;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Array;
@@ -9,12 +7,12 @@ import com.badlogic.gdx.utils.Array;
 import java.util.Random;
 
 import g11.mygdx.game.BattleSheep;
+import g11.mygdx.game.PlayServices;
 import g11.mygdx.game.modules.HomeButton;
 import g11.mygdx.game.modules.PlayButton;
 import g11.mygdx.game.sprites.Chicken;
 import g11.mygdx.game.sprites.Grass;
 import g11.mygdx.game.sprites.Sheep;
-
 
 public class PlaceAnimalState implements IState{
     private Array<Sprite> placeAnimalSprites;
@@ -25,8 +23,10 @@ public class PlaceAnimalState implements IState{
     private Sprite selectedAnimal;
     private Array<Sprite> allData;
     private Random rand = new Random();
+    private PlayServices action;
 
-    public PlaceAnimalState(){
+    public PlaceAnimalState(PlayServices actionResolver){
+        this.action = actionResolver;
         this.placeAnimalSprites = new Array<Sprite>();
         this.placeAnimalMessages = new Array<String>();
         this.allData = new Array<Sprite>();
@@ -109,6 +109,7 @@ public class PlaceAnimalState implements IState{
 
         if (allAnimalsPlaced){
             this.turnBoardToFile();
+            action.onDoneClicked();
             return "inGameStatus";
         }else{
             this.placeAnimalMessages.removeIndex(0);
@@ -145,12 +146,7 @@ public class PlaceAnimalState implements IState{
             boardRow = new String(result);
             board += boardRow + "\n";
         }
-
-        FileHandle handle = Gdx.files.local("myBoard.txt");
-        String text = handle.readString();
-        String fileRowArray[] = text.split("\\r?\\n");
-        String newFileText = fileRowArray[0] + "\n" + board;
-        handle.writeString(newFileText, false);
+        action.writeData(board.getBytes());
     }
 
 
@@ -173,7 +169,7 @@ public class PlaceAnimalState implements IState{
         } else if (selectedAnimal.getX() < BattleSheep.WIDTH * 0.0771) {
             selectedAnimal.setPosition((float) (BattleSheep.WIDTH * 0.0771),selectedAnimal.getY());
         }
-        if (selectedAnimal.getY() > BattleSheep.HEIGHT * 0.775) {
+        if (selectedAnimal.getY() > BattleSheep.HEIGHT * 0.75) {
             if (selectedAnimal instanceof Sheep){
                 selectedAnimal.setPosition(selectedAnimal.getX(), (float) (BattleSheep.HEIGHT * 0.73125));
             } else {

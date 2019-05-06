@@ -8,7 +8,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 
-public class BattleSheep extends ApplicationAdapter {
+
+public class BattleSheep extends ApplicationAdapter implements PlayServices{
 
 	public PlayServices localActionActionResolver;
 	public static int WIDTH = 480;
@@ -18,13 +19,14 @@ public class BattleSheep extends ApplicationAdapter {
 	public static final int VIRTUAL_HEIGHT = 800;
 	public static final float ASPECT_RATIO = (float) VIRTUAL_WIDTH / (float) VIRTUAL_HEIGHT;
 
-	private PlayServices ply;
 	public static final String TITLE = "BattleSheep";
 	private SpriteBatch batch;
 	private Controller controller;
 	private View view;
 	private Model model;
 	public static float delta;
+
+
 	public BattleSheep(PlayServices anActionResolver){
 		this.localActionActionResolver = anActionResolver;
 	}
@@ -65,5 +67,85 @@ public class BattleSheep extends ApplicationAdapter {
 	@Override
 	public void resume() {
 		super.resume();
+	}
+
+	@Override
+	public void signIn() {
+
+	}
+
+	@Override
+	public void signOut() {
+
+	}
+
+	@Override
+	public void rematch() {
+
+	}
+
+	@Override
+	public void onQuickMatchClicked() {
+
+	}
+
+    @Override
+    public String retrieveData() {
+        return null;
+    }
+
+    @Override
+    public void writeData(byte[] str) {
+
+    }
+
+	@Override
+	public String getmDisplayName() {
+		return null;
+	}
+
+	@Override
+	public void onDoneClicked() {
+
+	}
+
+	@Override
+	public void rateGame() {
+
+	}
+
+	@Override
+	public void unlockAchievement(String str) {
+
+	}
+
+	@Override
+	public void submitScore(int highScore) {
+
+	}
+
+	@Override
+	public void submitLevel(int highLevel) {
+
+	}
+
+	@Override
+	public void showAchievement() {
+
+	}
+
+	@Override
+	public void showScore() {
+
+	}
+
+	@Override
+	public void showLevel() {
+
+	}
+
+	@Override
+	public boolean isSignedIn() {
+		return false;
 	}
 }

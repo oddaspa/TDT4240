@@ -128,6 +128,10 @@ project(":core") {
         implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         implementation "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:$gamesvcsVersion"
+        implementation "com.google.android.gms:play-services-games:17.0.0"
+        implementation 'com.google.android.gms:play-services-auth:16.0.1'
+
+
 
     }
 }

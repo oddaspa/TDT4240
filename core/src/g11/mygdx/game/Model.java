@@ -18,12 +18,14 @@ public class Model {
     private ConfirmationState confirmationState;
     private String previousState;
     private String nextState;
+    private PlayServices action;
     // MAKE ALL THE STATES
 
     public Model(PlayServices actionResolver){
+        this.action = actionResolver;
         this.menu = new MenuState(actionResolver);
         this.loading = new LoadingState();
-        this.placeAnimal = new PlaceAnimalState();
+        this.placeAnimal = new PlaceAnimalState(actionResolver);
         this.inGameState = null;
         this.previousState = "menuState";
         this.nextState = "";
@@ -57,7 +59,7 @@ public class Model {
         }
         if(currentMode.equals("inGameStatus")){
             if(this.inGameState == null){
-                this.inGameState = new InGameState();
+                this.inGameState = new InGameState(this.action);
             }
             nextState = this.inGameState.parseInput(data);
             if (!nextState.equals(this.previousState)) {
