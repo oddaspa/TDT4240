@@ -120,7 +120,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 		mTurnTextView = findViewById(R.id.turn_counter_view);
 		*/
 		checkPlaceholderIds();
-
 	}
 
 	// SKELETON
@@ -341,8 +340,9 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 
 	// Open the create-game UI. You will get back an onActivityResult
 	// and figure out what to do.
-	public void onStartMatchClicked(View view) {
-		mTurnBasedMultiplayerClient.getSelectOpponentsIntent(1, 7, true)
+	@Override
+	public void onStartMatchClicked() {
+		mTurnBasedMultiplayerClient.getSelectOpponentsIntent(1, 1, true)
 				.addOnSuccessListener(new OnSuccessListener<Intent>() {
 					@Override
 					public void onSuccess(Intent intent) {
@@ -415,6 +415,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 	}
 
 	// Finish the game. Sometimes, this is your only choice.
+	@Override
 	public void onFinishClicked() {
 		//showSpinner();
 		mTurnBasedMultiplayerClient.finishMatch(mMatch.getMatchId())

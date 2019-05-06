@@ -110,6 +110,16 @@ public class BattleSheep extends ApplicationAdapter implements PlayServices{
 	}
 
 	@Override
+	public void onFinishClicked() {
+
+	}
+
+	@Override
+	public void onStartMatchClicked() {
+
+	}
+
+	@Override
 	public void rateGame() {
 
 	}

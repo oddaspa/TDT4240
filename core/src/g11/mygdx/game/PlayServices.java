@@ -10,6 +10,8 @@ public interface PlayServices
     public void writeData(byte[] str);
     public String getmDisplayName();
     public void onDoneClicked();
+    public void onFinishClicked();
+    public void onStartMatchClicked();
     public void rateGame();
     public void unlockAchievement(String str);
     public void submitScore(int highScore);

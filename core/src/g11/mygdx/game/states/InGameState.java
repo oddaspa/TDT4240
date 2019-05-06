@@ -27,9 +27,6 @@ public class InGameState implements IState {
     private float TOPBORDER = (float) (8 * BattleSheep.WIDTH / 10 + 1 + BattleSheep.HEIGHT * 0.375);
     private float BOTTOMBORDER = (float) (1 + BattleSheep.HEIGHT * 0.375);
     float[] formerData;
-    private boolean placedOpponentBoard;
-    private boolean placedMyBoard;
-    private boolean readFinished;
     private PlayServices action;
 
     public InGameState(PlayServices actionResolver){
@@ -39,16 +36,13 @@ public class InGameState implements IState {
         this.grassTiles = new Array<Sprite>();
         this.allSprites = new Array<Sprite>();
         this.inGameMessages = new Array<String>();
-        this.placedOpponentBoard = false;
-        this.placedMyBoard = false;
         loadData();
         allSprites = this.grassTiles;
         allSprites.addAll(opponentBoard);
         this.formerData = new float[2];
         Texture homeButtonTexture = new Texture("home.png");
-        Sprite homeButtonSprite = new Sprite(homeButtonTexture, homeButtonTexture.getWidth() / 6, homeButtonTexture.getHeight() / 6);
-        this.homeButton = new HomeButton(homeButtonSprite, (float) 10, (float) BattleSheep.HEIGHT - 10 - homeButtonSprite.getHeight());
-        this.readFinished = false;
+        Sprite homeButtonSprite = new Sprite(homeButtonTexture, BattleSheep.WIDTH / 10, BattleSheep.WIDTH / 10);
+        this.homeButton = new HomeButton(homeButtonSprite, (float) BattleSheep.WIDTH / 48, (float) BattleSheep.HEIGHT - BattleSheep.HEIGHT / 80 - homeButtonSprite.getHeight());
     }
 
 
@@ -110,9 +104,8 @@ public class InGameState implements IState {
 
     @Override
     public Array<Sprite> serveData() {
-        System.out.println("Size of myBoard");
-        System.out.println(this.myBoard.size);
-        Array<Sprite> allData = this.myBoard;
+        Array<Sprite> allData = new Array<Sprite>();
+        allData.addAll(this.myBoard);
         allData.addAll(this.grassTiles);
         allData.addAll(this.opponentBoard);
         allData.add(this.homeButton.getButton());
@@ -122,17 +115,11 @@ public class InGameState implements IState {
 
     @Override
     public void loadData() {
-        if(!this.placedMyBoard){
-            placeMyBoard();
-        }
-        if(!this.placedOpponentBoard){
-            placeOpponentBoard();
-        }
-
-
+        placeOpponentBoard();
+        placeMyBoard();
     }
 
-    public double[] parsePosition(float[] data){
+    private double[] parsePosition(float[] data){
         double[] output = new double[2];
         output[0] = -1;
         output[1] = -1;
@@ -153,37 +140,31 @@ public class InGameState implements IState {
         FileHandle handle = Gdx.files.local(file);
         String text = handle.readString();
         String wordsArray[] = text.split("\\r?\\n");
-        this.readFinished = true;
         return wordsArray;
     }
 
-    public void writeFile(String file, int col, int row, char item){
-        FileHandle handle = Gdx.files.local(file);
-        String text = handle.readString();
-        String wordsArray[] = text.split("\\r?\\n");
-        String returnArray[] = wordsArray;
-        handle.writeString("", false);
-        int i = 9;
-        for(String s : returnArray){
+    private void writeFile(int col, int row, char item){
+
+        String wordsArray[] = action.retrieveData().split("\n");
+        String returnString = new String();
+        int i = 8;
+        for(String s : wordsArray){
             if(i == row){
                 char[] ch = s.toCharArray();
                 ch[col-1] = item;
                 s = String.valueOf(ch);
             }
-            handle.writeString(s, true);
-            handle.writeString("\n", true);
+            returnString += s + "\n";
             i--;
         }
-
+        action.writeData(returnString.getBytes());
 
     }
 
     private void placeMyBoard(){
-        if(this.placedMyBoard){
-            return;
-        }
         String formerRow = "........";
         char formerLetter = '.';
+        //RESET
         this.myBoard = new Array<Sprite>();
         System.out.println("PlaceMyBoard");
         String[] fromFile = action.retrieveData().split("\n");
@@ -217,7 +198,6 @@ public class InGameState implements IState {
                     }
                 }
                 j++;
-                System.out.println("MyBoard Size: " + myBoard.size);
             }
             j = 0;
             i--;
@@ -227,17 +207,13 @@ public class InGameState implements IState {
         Sprite bonde = new Sprite(b, b.getWidth() / 2, b.getHeight() / 2);
         bonde.setPosition((float) (BattleSheep.WIDTH * 0.875), BattleSheep.HEIGHT / 16);
         this.myBoard.add(bonde);
-        this.placedMyBoard = true;
     }
 
     //TODO: USE CORRECT SPRITES
     private void placeOpponentBoard(){
-        if(this.placedOpponentBoard){
-            return;
-        }
         String formerRow = "........";
         char formerLetter = '.';
-        this.myBoard = new Array<Sprite>();
+        this.opponentBoard = new Array<Sprite>();
         String[] fromFile = action.retrieveData().split("\n");
         this.inGameMessages.add("");
         this.inGameMessages.add("Oscar");
@@ -279,9 +255,8 @@ public class InGameState implements IState {
         Sprite bonde = new Sprite(b,b.getWidth()/2,b.getHeight()/2);
         bonde.setPosition(BattleSheep.WIDTH / 8, (float) (BattleSheep.HEIGHT * 0.875));
         this.opponentBoard.add(bonde);
-        this.placedOpponentBoard = true;
     }
-    public void placeOpponentGrass(){
+    private void placeOpponentGrass(){
         for (int i = 0; i<8; i++) {
             for (int j = 0; j <8; j++) {
                 // Grass underneath
@@ -293,7 +268,7 @@ public class InGameState implements IState {
         }
     }
 
-    public Sprite getGrassTile(int col, int row){
+    private Sprite getGrassTile(int col, int row){
         float[] tilePos = new float[2];
         for(Sprite g : this.grassTiles){
             tilePos[0] = g.getX() + g.getWidth()/2;
@@ -306,24 +281,25 @@ public class InGameState implements IState {
         return null;
     }
 
-    public void makeMove(int col, int row){
-        writeFile("oppBoard.txt", col, row, 'X');
+    private void makeMove(int col, int row){
+        writeFile(col, row, 'X');
         System.out.println("make move");
         if(gameFinished()){
             System.out.println("You won!");
         }
 
     }
-
-    public boolean gameFinished() {
+    //TODO: c == 'x' || c == 'b'
+    private boolean gameFinished() {
         String[] fromFile = action.retrieveData().split("\n");
         for (String s : fromFile) {
             for (char c : s.toCharArray()) {
-                if (c == 'x' || c == 'b') {
+                if (c == 'c' || c == 's') {
                     return false;
                 }
             }
         }
+        action.onFinishClicked();
         return true;
     }
 }

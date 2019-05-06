@@ -44,7 +44,7 @@ public class MenuState implements IState {
 
         if (this.matchMaking.isClicked(data[0], data[1])){
             action.unlockAchievement("CgkIiJTL5d0KEAIQBA");
-            //action.onQuickMatchClicked();
+            action.onStartMatchClicked();
             return "menuState";
         }
 
