@@ -80,7 +80,8 @@ public class SkeletonTurn {
         SkeletonTurn retVal = new SkeletonTurn();
 
         try {
-            JSONObject obj = new JSONObject(st);
+            JSONObject obj = new JSONObject();
+            obj.put("data", st);
 
             if (obj.has("data")) {
                 retVal.data = obj.getString("data");
@@ -92,7 +93,6 @@ public class SkeletonTurn {
         } catch (JSONException e) {
             Log.e("SkeletonTurn", "There was an issue parsing JSON!", e);
         }
-
         return retVal;
     }
 }

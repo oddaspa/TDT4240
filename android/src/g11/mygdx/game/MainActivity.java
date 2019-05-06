@@ -1,5 +1,8 @@
 package g11.mygdx.game;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -34,11 +37,14 @@ import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchUpdateCa
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.OnFailureListener;
 
+import java.util.ArrayList;
+
 
 public class MainActivity extends AndroidApplication implements  GoogleApiClient.OnConnectionFailedListener, PlayServices {
 
     private GoogleApiClient googleApiClient;
     private static final int REQ_CODE = 9001;
+    private static final int RC_SELECT_PLAYERS = 10000;
     private GoogleSignInAccount account= null;
 
     // Client used to interact with the TurnBasedMultiplayer system.
@@ -49,6 +55,8 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     public TurnBasedMatch mMatch = null;
     public SkeletonTurn mTurnData;
     private Player mPlayer;
+    // Should I be showing the turn API?
+    public boolean isDoingTurn = false;
 
 
 
@@ -140,6 +148,55 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleResult(result);
         }
+
+        else if (requestCode == RC_SELECT_PLAYERS) {
+            // Returning from 'Select players to Invite' dialog
+
+            if (resultCode != Activity.RESULT_OK) {
+                // user canceled
+                Gdx.app.log("RC_SELECT_PLAYERS","User cancelled returning from 'Select players to Invite' dialog");
+                return;
+            }
+
+            // get the invitee list
+            ArrayList<String> invitees = data
+                    .getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
+
+            // get automatch criteria
+            Bundle autoMatchCriteria;
+
+            int minAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS, 0);
+            int maxAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS, 0);
+
+            if (minAutoMatchPlayers > 0) {
+                autoMatchCriteria = RoomConfig.createAutoMatchCriteria(minAutoMatchPlayers,
+                        maxAutoMatchPlayers, 0);
+            } else {
+                autoMatchCriteria = null;
+            }
+
+            TurnBasedMatchConfig tbmc = TurnBasedMatchConfig.builder()
+                    .addInvitedPlayers(invitees)
+                    .setAutoMatchCriteria(autoMatchCriteria).build();
+
+            // Start the match
+            mTurnBasedMultiplayerClient.createMatch(tbmc)
+                    .addOnSuccessListener(new OnSuccessListener<TurnBasedMatch>() {
+                        @Override
+                        public void onSuccess(TurnBasedMatch turnBasedMatch) {
+                            Gdx.app.log("RC_SELECT_PLAYERS","Starting match...");
+                            onInitiateMatch(turnBasedMatch);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Gdx.app.log("RC_SELECT_PLAYERS","There was a problem creating a match!");
+                        }
+                    });
+            //showSpinner();
+        }
+
     }
 
     @Override
@@ -148,17 +205,39 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     }
 
 
+
+
     @Override
     public boolean isSignedIn() {
         return account != null;
     }
 
 
+    // Open the create-game UI. You will get back an onActivityResult
+    // and figure out what to do.
+    @Override
+    public void onStartMatchClicked() {
+        mTurnBasedMultiplayerClient = Games.getTurnBasedMultiplayerClient(this, account);
+        mInvitationsClient = Games.getInvitationsClient(this, account);
+        mTurnBasedMultiplayerClient.getSelectOpponentsIntent(1, 1, true)
+                .addOnSuccessListener(new OnSuccessListener<Intent>() {
+                    @Override
+                    public void onSuccess(Intent intent) {
+                        startActivityForResult(intent, RC_SELECT_PLAYERS);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Gdx.app.log("------> onStartMatchClicked()","error_get_select_opponents");
+                    }
+                });
+    }
+
     @Override
     public void createMatch() {
         mTurnBasedMultiplayerClient = Games.getTurnBasedMultiplayerClient(this, account);
         mInvitationsClient = Games.getInvitationsClient(this, account);
-
         Gdx.app.log("------> createMatch()", "Connection successful");
 
         // Retrieve the TurnBasedMatch from the connectionHint
@@ -236,6 +315,144 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         startMatch();
     }
 
+    // Finish the game. Sometimes, this is your only choice.
+    @Override
+    public void onFinishClicked() {
+        //showSpinner();
+        mTurnBasedMultiplayerClient.finishMatch(mMatch.getMatchId())
+                .addOnSuccessListener(new OnSuccessListener<TurnBasedMatch>() {
+                    @Override
+                    public void onSuccess(TurnBasedMatch turnBasedMatch) {
+                        onUpdateMatch(turnBasedMatch);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Gdx.app.log("onFinnishedClicked()","There was a problem finishing the match!");
+                    }
+                });
+
+        isDoingTurn = false;
+        //setViewVisibility();
+    }
+
+    // Upload your new gamestate, then take a turn, and pass it on to the next
+    // player.
+    @Override
+    public void onDoneClicked() {
+
+        String nextParticipantId = getNextParticipantId();
+        // Create the next turn
+        mTurnData.turnCounter += 1;
+        //mTurnData.data = new String(mMatch.getData());
+
+        mTurnBasedMultiplayerClient.takeTurn(mMatch.getMatchId(),
+                mTurnData.persist(), nextParticipantId)
+                .addOnSuccessListener(new OnSuccessListener<TurnBasedMatch>() {
+                    @Override
+                    public void onSuccess(TurnBasedMatch turnBasedMatch) {
+                        onUpdateMatch(turnBasedMatch);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Gdx.app.log("onDoneCklicked()","There was a problem taking a turn!");
+                    }
+                });
+
+        //mTurnData = null;
+    }
+
+    @Override
+    public void writeData(byte[] str){
+        mTurnData = mTurnData.unpersist(str);
+        //onInitiateMatch(mMatch);
+    }
+    @Override
+    public String retrieveData(){
+        return mTurnData.data;
+    }
+    @Override
+    public String getmDisplayName(){
+        return mPlayer.getDisplayName();
+    }
+
+    public void onUpdateMatch(TurnBasedMatch match) {
+        //dismissSpinner();
+
+        if (match.canRematch()) {
+            askForRematch();
+        }
+
+        isDoingTurn = (match.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN);
+
+        if (isDoingTurn) {
+            mMatch = match;
+            updateMatch();
+            return;
+        }
+
+        //setViewVisibility();
+    }
+
+    // If you choose to rematch, then call it and wait for a response.
+    public void rematch() {
+        //showSpinner();
+        mTurnBasedMultiplayerClient.rematch(mMatch.getMatchId())
+                .addOnSuccessListener(new OnSuccessListener<TurnBasedMatch>() {
+                    @Override
+                    public void onSuccess(TurnBasedMatch turnBasedMatch) {
+                        onInitiateMatch(turnBasedMatch);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Gdx.app.log("rematch()","There was a problem starting a rematch!");
+                    }
+                });
+        mMatch = null;
+        isDoingTurn = false;
+    }
+
+    /**
+     * Get the next participant. In this function, we assume that we are
+     * round-robin, with all known players going before all automatch players.
+     * This is not a requirement; players can go in any order. However, you can
+     * take turns in any order.
+     *
+     * @return participantId of next player, or null if automatching
+     */
+    public String getNextParticipantId() {
+
+        String myParticipantId = mMatch.getParticipantId(mPlayer.getPlayerId());
+
+        ArrayList<String> participantIds = mMatch.getParticipantIds();
+
+        int desiredIndex = -1;
+
+        for (int i = 0; i < participantIds.size(); i++) {
+            if (participantIds.get(i).equals(myParticipantId)) {
+                desiredIndex = i + 1;
+            }
+        }
+
+        if (desiredIndex < participantIds.size()) {
+            return participantIds.get(desiredIndex);
+        }
+
+        if (mMatch.getAvailableAutoMatchSlots() <= 0) {
+            // You've run out of automatch slots, so we start over.
+            return participantIds.get(0);
+        } else {
+            // You have not yet fully automatched, so null will find a new
+            // person to play against.
+            return null;
+        }
+    }
+
 
     // This is only called on success, so we should have a
     // valid match object. We're taking this opportunity to setup the
@@ -248,7 +465,8 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         mTurnData.data = "First turn";
 
         String myParticipantId = mMatch.getParticipantId(mPlayer.getPlayerId());
-
+        String myOpponent = mMatch.getParticipantIds().get(1);
+        Gdx.app.log("------> startMatch()", "myParticipantID: "+myParticipantId+ " my opponentID: "+myOpponent);
 
         mTurnBasedMultiplayerClient.takeTurn(mMatch.getMatchId(),
                 mTurnData.persist(), myParticipantId)
@@ -316,6 +534,31 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
 
         mTurnData = null;
 
+    }
+
+    // Rematch dialog
+    public void askForRematch() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        alertDialogBuilder.setMessage("Do you want a rematch?");
+
+        alertDialogBuilder
+                .setCancelable(false)
+                .setPositiveButton("Sure, rematch!",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                rematch();
+                            }
+                        })
+                .setNegativeButton("No.",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                            }
+                        });
+
+        alertDialogBuilder.show();
     }
 
 

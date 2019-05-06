@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Array;
 
 import g11.mygdx.game.BattleSheep;
+import g11.mygdx.game.PlayServices;
 import g11.mygdx.game.modules.HomeButton;
 import g11.mygdx.game.sprites.Chicken;
 import g11.mygdx.game.sprites.Grass;
@@ -23,12 +24,13 @@ public class InGameState implements IState {
     private double row = 0;
     private float LEFTBORDER = 1 + BattleSheep.WIDTH / 10;
     private float RIGHTBOARDER = 8 * BattleSheep.WIDTH / 10 + 1 + BattleSheep.WIDTH / 10;
-    private float TOPBORDER = 8 * BattleSheep.WIDTH / 10 + 1 + 300;
-    private float BOTTOMBORDER = 1 + 300;
+    private float TOPBORDER = (float) (8 * BattleSheep.WIDTH / 10 + 1 + BattleSheep.HEIGHT * 0.375);
+    private float BOTTOMBORDER = (float) (1 + BattleSheep.HEIGHT * 0.375);
     float[] formerData;
-    private boolean readFinished;
+    private PlayServices action;
 
-    public InGameState(){
+    public InGameState(PlayServices actionResolver){
+        this.action = actionResolver;
         this.myBoard = new Array<Sprite>();
         this.opponentBoard = new Array<Sprite>();
         this.grassTiles = new Array<Sprite>();
@@ -39,9 +41,8 @@ public class InGameState implements IState {
         allSprites.addAll(opponentBoard);
         this.formerData = new float[2];
         Texture homeButtonTexture = new Texture("home.png");
-        Sprite homeButtonSprite = new Sprite(homeButtonTexture, homeButtonTexture.getWidth() / 6, homeButtonTexture.getHeight() / 6);
-        this.homeButton = new HomeButton(homeButtonSprite, (float) 10, (float) BattleSheep.HEIGHT - 10 - homeButtonSprite.getHeight());
-        this.readFinished = false;
+        Sprite homeButtonSprite = new Sprite(homeButtonTexture, BattleSheep.WIDTH / 10, BattleSheep.WIDTH / 10);
+        this.homeButton = new HomeButton(homeButtonSprite, (float) BattleSheep.WIDTH / 48, (float) BattleSheep.HEIGHT - BattleSheep.HEIGHT / 80 - homeButtonSprite.getHeight());
     }
 
 
@@ -103,7 +104,8 @@ public class InGameState implements IState {
 
     @Override
     public Array<Sprite> serveData() {
-        Array<Sprite> allData = this.myBoard;
+        Array<Sprite> allData = new Array<Sprite>();
+        allData.addAll(this.myBoard);
         allData.addAll(this.grassTiles);
         allData.addAll(this.opponentBoard);
         allData.add(this.homeButton.getButton());
@@ -113,11 +115,11 @@ public class InGameState implements IState {
 
     @Override
     public void loadData() {
-        placeOpponentBoard("oppBoard.txt");
-        placeMyBoard("myBoard.txt");
+        placeOpponentBoard();
+        placeMyBoard();
     }
 
-    public double[] parsePosition(float[] data){
+    private double[] parsePosition(float[] data){
         double[] output = new double[2];
         output[0] = -1;
         output[1] = -1;
@@ -138,115 +140,101 @@ public class InGameState implements IState {
         FileHandle handle = Gdx.files.local(file);
         String text = handle.readString();
         String wordsArray[] = text.split("\\r?\\n");
-        this.readFinished = true;
         return wordsArray;
     }
 
-    public void writeFile(String file, int col, int row, char item){
-        FileHandle handle = Gdx.files.local(file);
-        String text = handle.readString();
-        String wordsArray[] = text.split("\\r?\\n");
-        String returnArray[] = wordsArray;
-        handle.writeString("", false);
-        int i = 9;
-        for(String s : returnArray){
+    private void writeFile(int col, int row, char item){
+
+        String wordsArray[] = action.retrieveData().split("\n");
+        String returnString = new String();
+        int i = 8;
+        for(String s : wordsArray){
             if(i == row){
                 char[] ch = s.toCharArray();
                 ch[col-1] = item;
                 s = String.valueOf(ch);
             }
-            handle.writeString(s, true);
-            handle.writeString("\n", true);
+            returnString += s + "\n";
             i--;
         }
-
+        action.writeData(returnString.getBytes());
 
     }
 
-    private void placeMyBoard(String file){
-        if(this.readFinished) {
-            String formerRow = "........";
-            char formerLetter = '.';
-            this.myBoard = new Array<Sprite>();
-            String[] fromFile = readFile(file);
-            float rangeY = (BattleSheep.HEIGHT / 4) / 8;
-            this.inGameMessages.add(fromFile[0]);
-            int i = 8;
-            int j = 0;
-            int k = 0;
-            for (String s : fromFile) {
-                if (k == 0) {
-                    k++;
-                    continue;
+    private void placeMyBoard(){
+        String formerRow = "........";
+        char formerLetter = '.';
+        //RESET
+        this.myBoard = new Array<Sprite>();
+        System.out.println("PlaceMyBoard");
+        String[] fromFile = action.retrieveData().split("\n");
+        float rangeY = (BattleSheep.HEIGHT / 4) / 8;
+        this.inGameMessages.add(action.getmDisplayName());
+        int i = 8;
+        int j = 0;
+        for (String s : fromFile) {
+            for (char c : s.toCharArray()) {
+                // Grass underneath
+                Grass grass = new Grass();
+                grass.setPosition(j * rangeY + 1 + BattleSheep.WIDTH / 4, i * rangeY + 1 + BattleSheep.HEIGHT / 16);
+                this.myBoard.add(grass);
+                if (c == 'c') {
+                    // Chicken
+                    Texture tex = new Texture("chicken-liten.png");
+                    Sprite chicken = new Sprite(tex, Math.round(rangeY) - 2, Math.round(rangeY) - 2);
+                    chicken.setPosition(j * rangeY + 1 + BattleSheep.WIDTH / 4, i * rangeY + 1 + BattleSheep.HEIGHT / 16);
+                    this.myBoard.add(chicken);
+                    grass.setAnimal(chicken);
                 }
-
-                for (char c : s.toCharArray()) {
-                    // Grass underneath
-                    Grass grass = new Grass();
-                    grass.setPosition(j * rangeY + 1 + BattleSheep.WIDTH / 4, i * rangeY + 1 + 50);
-                    this.myBoard.add(grass);
-                    if (c == 'c') {
-                        // Chicken
-                        Texture tex = new Texture("chicken-liten.png");
-                        Sprite chicken = new Sprite(tex, Math.round(rangeY) - 2, Math.round(rangeY) - 2);
-                        chicken.setPosition(j * rangeY + 1 + BattleSheep.WIDTH / 4, i * rangeY + 1 + 50);
-                        this.myBoard.add(chicken);
-                        grass.setAnimal(chicken);
+                if (c == 's' && formerRow.toCharArray()[j] == 's') {
+                    if(formerLetter == 's') {
+                        formerLetter = '.';
+                        Texture tex = new Texture("sheep-liten.png");
+                        Sprite sheep = new Sprite(tex, Math.round(rangeY * 2) - 2, Math.round(rangeY * 2) - 2);
+                        sheep.setPosition((j - 1)  * rangeY + 1 + BattleSheep.WIDTH / 4, i * rangeY + 1 + BattleSheep.HEIGHT / 16);
+                        this.myBoard.add(sheep);
+                    } else {
+                        formerLetter = 's';
                     }
-                    if (c == 's' && formerRow.toCharArray()[j] == 's') {
-                        if(formerLetter == 's') {
-                            formerLetter = '.';
-                            Texture tex = new Texture("sheep-liten.png");
-                            Sprite sheep = new Sprite(tex, Math.round(rangeY * 2) - 2, Math.round(rangeY * 2) - 2);
-                            sheep.setPosition((j - 1)  * rangeY + 1 + BattleSheep.WIDTH / 4, i * rangeY + 1 + 50);
-                            this.myBoard.add(sheep);
-                        } else {
-                            formerLetter = 's';
-                        }
-                    }
-                    j++;
                 }
-                j = 0;
-                i--;
-                formerRow = s;
+                j++;
             }
-            Texture b = new Texture("bonde-liten.png");
-            Sprite bonde = new Sprite(b, b.getWidth() / 2, b.getHeight() / 2);
-            bonde.setPosition(420, 50);
-            this.myBoard.add(bonde);
+            j = 0;
+            i--;
+            formerRow = s;
         }
+        Texture b = new Texture("bonde-liten.png");
+        Sprite bonde = new Sprite(b, b.getWidth() / 2, b.getHeight() / 2);
+        bonde.setPosition((float) (BattleSheep.WIDTH * 0.875), BattleSheep.HEIGHT / 16);
+        this.myBoard.add(bonde);
     }
 
     //TODO: USE CORRECT SPRITES
-    private void placeOpponentBoard(String file){
+    private void placeOpponentBoard(){
         String formerRow = "........";
         char formerLetter = '.';
-        this.myBoard = new Array<Sprite>();
-        String[] fromFile = readFile(file);
+        this.opponentBoard = new Array<Sprite>();
+        String[] fromFile = action.retrieveData().split("\n");
         this.inGameMessages.add("");
-        this.inGameMessages.add(fromFile[0]);
+        this.inGameMessages.add("Oscar");
         int i = 8;
         int j = 0;
-        int k = 0;
         placeOpponentGrass();
         for(String s : fromFile) {
-            if (k == 0) {
-                k++;
-                continue;
-            }
+            //TODO: Fix c == 'x' , c == 'b' && formerRow.toCharArray()[j] == 'b'
             for (char c : s.toCharArray()) {
-                if (c == 'x') {
+                if (c == 'c') {
                     // Chicken
                     Chicken chicken = new Chicken(0, 0);
-                    chicken.setPosition(j * (BattleSheep.WIDTH / 10) + 1 + (BattleSheep.WIDTH / 10), (i - 1) * (BattleSheep.WIDTH / 10) + 1 + 300);
+                    chicken.setPosition(j * (BattleSheep.WIDTH / 10) + 1 + (BattleSheep.WIDTH / 10), (float) ((i - 1) * (BattleSheep.WIDTH / 10) + 1 + BattleSheep.HEIGHT * 0.375));
                     this.opponentBoard.add(chicken);
                     ((Grass) getGrassTile(j + 1,i)).setAnimal(chicken);
                 }
-                if (c == 'b' && formerRow.toCharArray()[j] == 'b') {
-                    if (formerLetter == 'b') {
+                if (c == 's' && formerRow.toCharArray()[j] == 's') {
+                    if (formerLetter == 's') {
                         formerLetter = '.';
                         Sheep sheep = new Sheep(0, 0);
-                        sheep.setPosition((j - 1) * (BattleSheep.WIDTH / 10) + 1 + (BattleSheep.WIDTH / 10), (i - 1) * BattleSheep.WIDTH / 10 + 1 + 300);
+                        sheep.setPosition((j - 1) * (BattleSheep.WIDTH / 10) + 1 + (BattleSheep.WIDTH / 10), (float) ((i - 1) * BattleSheep.WIDTH / 10 + 1 + BattleSheep.HEIGHT * 0.375));
                         this.opponentBoard.add(sheep);
                         ((Grass) getGrassTile(j+1,i)).setAnimal(sheep);
                         ((Grass) getGrassTile(j,i)).setAnimal(sheep);
@@ -254,7 +242,7 @@ public class InGameState implements IState {
                         ((Grass) getGrassTile(j+1,i+1)).setAnimal(sheep);
 
                     }else {
-                        formerLetter = 'b';
+                        formerLetter = 's';
                     }
                 }
                 j++;
@@ -265,22 +253,22 @@ public class InGameState implements IState {
         }
         Texture b = new Texture("bonde-liten.png");
         Sprite bonde = new Sprite(b,b.getWidth()/2,b.getHeight()/2);
-        bonde.setPosition(60,700);
-        this.myBoard.add(bonde);
+        bonde.setPosition(BattleSheep.WIDTH / 8, (float) (BattleSheep.HEIGHT * 0.875));
+        this.opponentBoard.add(bonde);
     }
-    public void placeOpponentGrass(){
+    private void placeOpponentGrass(){
         for (int i = 0; i<8; i++) {
             for (int j = 0; j <8; j++) {
                 // Grass underneath
                 Grass grass = new Grass();
                 grass.setSize(BattleSheep.WIDTH / 10 - 2, BattleSheep.WIDTH / 10 - 2);
-                grass.setPosition(j * BattleSheep.WIDTH / 10 + 1 + BattleSheep.WIDTH / 10, i * BattleSheep.WIDTH / 10 + 1 + 300);
+                grass.setPosition(j * BattleSheep.WIDTH / 10 + 1 + BattleSheep.WIDTH / 10, (float) (i * BattleSheep.WIDTH / 10 + 1 + BattleSheep.HEIGHT * 0.375));
                 this.grassTiles.add(grass);
             }
         }
     }
 
-    public Sprite getGrassTile(int col, int row){
+    private Sprite getGrassTile(int col, int row){
         float[] tilePos = new float[2];
         for(Sprite g : this.grassTiles){
             tilePos[0] = g.getX() + g.getWidth()/2;
@@ -293,24 +281,26 @@ public class InGameState implements IState {
         return null;
     }
 
-    public void makeMove(int col, int row){
-        writeFile("oppBoard.txt", col, row, 'X');
+    private void makeMove(int col, int row){
+        writeFile(col, row, 'X');
         System.out.println("make move");
-        if(gameFinished("oppBoard.txt")){
+        if(gameFinished()){
             System.out.println("You won!");
         }
 
     }
-
-    public boolean gameFinished(String file) {
-        String[] fromFile = readFile(file);
+    //TODO: c == 'x' || c == 'b'
+    private boolean gameFinished() {
+        String[] fromFile = action.retrieveData().split("\n");
         for (String s : fromFile) {
             for (char c : s.toCharArray()) {
-                if (c == 'x' || c == 'b') {
+                if (c == 'c' || c == 's') {
                     return false;
                 }
             }
         }
+        action.onFinishClicked();
         return true;
     }
+
 }

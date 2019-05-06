@@ -13,5 +13,11 @@ public interface PlayServices
     public void showLevel();
     public boolean isSignedIn();
     public void createMatch();
+    public void onStartMatchClicked();
+    public void onDoneClicked();
+    public void writeData(byte[] string);
+    public void onFinishClicked();
+    public String retrieveData();
+    public String getmDisplayName();
 }
 
