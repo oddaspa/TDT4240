@@ -33,8 +33,9 @@ public class BattleSheep extends ApplicationAdapter {
 	public void create () {
 		if(Gdx.app.getType() == Application.ApplicationType.Android) {
 			// android specific code
-			BattleSheep.WIDTH = 1080;
-			BattleSheep.HEIGHT = 1920;
+			BattleSheep.WIDTH = Gdx.graphics.getWidth();
+			BattleSheep.HEIGHT = Gdx.graphics.getHeight();
+
 		}
 		localActionActionResolver.signIn();
 

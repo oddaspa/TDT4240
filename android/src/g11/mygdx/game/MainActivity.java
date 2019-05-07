@@ -154,7 +154,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
 
             if (resultCode != Activity.RESULT_OK) {
                 // user canceled
-                Gdx.app.log("RC_SELECT_PLAYERS","User cancelled returning from 'Select players to Invite' dialog");
+                Gdx.app.log("------> RC_SELECT_PLAYERS","User cancelled returning from 'Select players to Invite' dialog");
                 return;
             }
 
@@ -184,14 +184,14 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                     .addOnSuccessListener(new OnSuccessListener<TurnBasedMatch>() {
                         @Override
                         public void onSuccess(TurnBasedMatch turnBasedMatch) {
-                            Gdx.app.log("RC_SELECT_PLAYERS","Starting match...");
+                            Gdx.app.log("------> RC_SELECT_PLAYERS","Starting match...");
                             onInitiateMatch(turnBasedMatch);
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Gdx.app.log("RC_SELECT_PLAYERS","There was a problem creating a match!");
+                            Gdx.app.log("------> RC_SELECT_PLAYERS","There was a problem creating a match!");
                         }
                     });
             //showSpinner();
@@ -318,7 +318,6 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     // Finish the game. Sometimes, this is your only choice.
     @Override
     public void onFinishClicked() {
-        //showSpinner();
         mTurnBasedMultiplayerClient.finishMatch(mMatch.getMatchId())
                 .addOnSuccessListener(new OnSuccessListener<TurnBasedMatch>() {
                     @Override
@@ -329,12 +328,12 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Gdx.app.log("onFinnishedClicked()","There was a problem finishing the match!");
+                        Gdx.app.log("------> onFinnishedClicked()","There was a problem finishing the match!");
                     }
                 });
 
         isDoingTurn = false;
-        //setViewVisibility();
+
     }
 
     // Upload your new gamestate, then take a turn, and pass it on to the next
@@ -358,7 +357,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Gdx.app.log("onDoneCklicked()","There was a problem taking a turn!");
+                        Gdx.app.log("------> onDoneCklicked()","There was a problem taking a turn!");
                     }
                 });
 
@@ -380,21 +379,17 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     }
 
     public void onUpdateMatch(TurnBasedMatch match) {
-        //dismissSpinner();
-
         if (match.canRematch()) {
             askForRematch();
         }
 
         isDoingTurn = (match.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN);
-
+        Gdx.app.log("------> onUpdateMatch()" ,"your turn: "+isDoingTurn);
         if (isDoingTurn) {
             mMatch = match;
             updateMatch();
             return;
         }
-
-        //setViewVisibility();
     }
 
     // If you choose to rematch, then call it and wait for a response.
@@ -410,7 +405,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Gdx.app.log("rematch()","There was a problem starting a rematch!");
+                        Gdx.app.log("------> rematch()","There was a problem starting a rematch!");
                     }
                 });
         mMatch = null;
@@ -491,21 +486,21 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     public void updateMatch() {
         int status = mMatch.getStatus();
         int turnStatus = mMatch.getTurnStatus();
-
+        Gdx.app.log("------> updateMatch()","status: "+status+" turnStatus: "+turnStatus);
         switch (status) {
             case TurnBasedMatch.MATCH_STATUS_CANCELED:
-                Gdx.app.log("Canceled!", "This game was canceled!");
+                Gdx.app.log("------> Canceled!", "This game was canceled!");
                 return;
             case TurnBasedMatch.MATCH_STATUS_EXPIRED:
-                Gdx.app.log("Expired!", "This game is expired.  So sad!");
+                Gdx.app.log("------> Expired!", "This game is expired.  So sad!");
                 return;
             case TurnBasedMatch.MATCH_STATUS_AUTO_MATCHING:
-                Gdx.app.log("Waiting for auto-match...",
+                Gdx.app.log("------> Waiting for auto-match...",
                         "We're still waiting for an automatch partner.");
                 return;
             case TurnBasedMatch.MATCH_STATUS_COMPLETE:
                 if (turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_COMPLETE) {
-                    Gdx.app.log("Complete!",
+                    Gdx.app.log("------> Complete!",
                             "This game is over; someone finished it, and so did you!  " +
                                     "There is nothing to be done.");
                     break;
@@ -513,7 +508,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
 
                 // Note that in this state, you must still call "Finish" yourself,
                 // so we allow this to continue.
-                Gdx.app.log("Complete!",
+                Gdx.app.log("------> Complete!",
                         "This game is over; someone finished it!  You can only finish it now.");
         }
 
@@ -521,14 +516,14 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         switch (turnStatus) {
             case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
                 mTurnData = SkeletonTurn.unpersist(mMatch.getData());
-                //setGameplayUI();
+                Gdx.app.log("------> updateMatch()","write code to take turn here");
                 return;
             case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN:
                 // Should return results.
-                Gdx.app.log("Alas...", "It's not your turn.");
+                Gdx.app.log("------> Alas...", "It's not your turn.");
                 break;
             case TurnBasedMatch.MATCH_TURN_STATUS_INVITED:
-                Gdx.app.log("Good inititative!",
+                Gdx.app.log("------> Good inititative!",
                         "Still waiting for invitations.\n\nBe patient!");
         }
 
