@@ -1,6 +1,7 @@
 package g11.mygdx.game.states;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Array;
@@ -19,6 +20,8 @@ import g11.mygdx.game.modules.SignInButton;
         private Button matchMaking;
         private PlayServices action;
         private float[] formerData;
+        private Sprite signInButton;
+        private Sprite signOutButton;
         // MAKE ALL THE STATES
 
         public MenuState(PlayServices actionResolver){
@@ -29,17 +32,26 @@ import g11.mygdx.game.modules.SignInButton;
         }
         @Override
         public String parseInput(float[] data){
+            if (action.isSignedIn()){
+                if (menuSprites.get(3) == signInButton){
+                    menuSprites.set(3,signOutButton);
+                }
+            }else {
+                if (menuSprites.get(3) == signOutButton){
+                    menuSprites.set(3,signInButton);
+                }
+            }
             if (data == null) {return "menuState";}
             if(data == formerData){
                 return "menuState";
             }
             formerData = data;
-            if (this.signIn.isClicked(data[0], data[1])) {
+            if (menuSprites.get(3) == signInButton && this.signIn.isClicked(data[0], data[1])) {
                 action.signIn();
                 return "menuState";
             }
 
-            if (this.signOut.isClicked(data[0], data[1])) {
+            if (menuSprites.get(3) == signOutButton && this.signOut.isClicked(data[0], data[1])) {
                 action.signOut();
                 return "menuState";
             }
@@ -76,7 +88,7 @@ import g11.mygdx.game.modules.SignInButton;
         public void loadData(){
             Texture bg = new Texture("background2.jpg");
             Sprite background = new Sprite(bg);
-            background.setPosition(0,0);
+            background.setPosition(-15,5);
             background.setSize(BattleSheep.WIDTH,BattleSheep.HEIGHT);
         /*
         Texture playBtn = new Texture("quick_game.png");
@@ -86,31 +98,30 @@ import g11.mygdx.game.modules.SignInButton;
         */
             Texture challengeBtn = new Texture("challenge_friend.png");
             Sprite challengeButton = new Sprite(challengeBtn);
-            challengeButton.setSize(2 * BattleSheep.WIDTH / 3, BattleSheep.HEIGHT / 4);
-            this.matchMaking = new SignInButton(challengeButton, BattleSheep.WIDTH / 6, BattleSheep.HEIGHT / 14);
+            challengeButton.setSize(2 * BattleSheep.WIDTH / 3, BattleSheep.HEIGHT / 6);
+            this.matchMaking = new SignInButton(challengeButton, BattleSheep.WIDTH/2 - (challengeButton.getWidth()/2), BattleSheep.HEIGHT / 8);
 
 
-            // GPGS STUFF
-            Texture signInTex = new Texture("sign_in_button1.png");
-            Sprite signInButton = new Sprite(signInTex);
-            signInButton.setSize(BattleSheep.WIDTH / 4, BattleSheep.HEIGHT / 12);
-            this.signIn = new SignInButton(signInButton,0,0);
 
-            Texture signOutTex = new Texture("sign_out_button1.png");
-            Sprite signOutButton = new Sprite(signOutTex);
-            signOutButton.setSize(BattleSheep.WIDTH / 4, BattleSheep.HEIGHT / 12);
-            this.signOut = new SignInButton(signOutButton,BattleSheep.WIDTH - BattleSheep.WIDTH/4,0);
 
             Texture quickTex = new Texture("quick_game.png");
             Sprite quickGameButton = new Sprite(quickTex);
-            quickGameButton.setSize(2 * BattleSheep.WIDTH / 3, BattleSheep.HEIGHT / 4);
-            this.quickGame = new SignInButton(quickGameButton,BattleSheep.WIDTH / 6, (BattleSheep.HEIGHT *2 / 7));
+            quickGameButton.setSize(2 * BattleSheep.WIDTH / 3, BattleSheep.HEIGHT / 6);
+            this.quickGame = new SignInButton(quickGameButton,BattleSheep.WIDTH/2 - (quickGameButton.getWidth()/2), (BattleSheep.HEIGHT *2 / 6));
 
             this.menuSprites.add(background);
             this.menuSprites.add(quickGameButton);
             this.menuSprites.add(challengeButton);
 
-            this.menuSprites.add(signInButton);
+            // GPGS STUFF
+            signInButton = new Sprite(new Texture("login.png"));
+            signInButton.setSize(BattleSheep.WIDTH / 4, BattleSheep.HEIGHT / 12);
+            this.signIn = new SignInButton(signInButton,BattleSheep.WIDTH/2 -(signInButton.getWidth()/2),0);
+
+            signOutButton = new Sprite(new Texture("logout.png"));
+            signOutButton.setSize(BattleSheep.WIDTH / 4, BattleSheep.HEIGHT / 12);
+            this.signOut = new SignInButton(signOutButton,BattleSheep.WIDTH/2 -(signOutButton.getWidth()/2),0);
+
             this.menuSprites.add(signOutButton);
         }
     }

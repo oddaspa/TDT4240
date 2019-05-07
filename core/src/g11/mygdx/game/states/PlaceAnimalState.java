@@ -40,14 +40,15 @@ public class PlaceAnimalState implements IState{
         this.homeButton = new HomeButton(homeButtonSprite, (float) BattleSheep.WIDTH / 48, (float) BattleSheep.HEIGHT - BattleSheep.HEIGHT / 80 - homeButtonSprite.getHeight());
 
         Texture playButtonTexture = new Texture("play.png");
-        Sprite playButtonSprite = new Sprite(playButtonTexture, BattleSheep.WIDTH / 2, BattleSheep.WIDTH / 10);
+        Sprite playButtonSprite = new Sprite(playButtonTexture, BattleSheep.WIDTH / 3, BattleSheep.WIDTH / 10);
         this.playButton = new PlayButton(playButtonSprite, BattleSheep.WIDTH - BattleSheep.WIDTH / 48 - playButtonSprite.getWidth(), BattleSheep.HEIGHT - BattleSheep.HEIGHT / 80 - homeButtonSprite.getHeight());
 
-        Texture randomizeButtonTexture = new Texture("play.png");
-        Sprite randomizeButtonSprite = new Sprite(randomizeButtonTexture, BattleSheep.WIDTH / 2, BattleSheep.WIDTH / 10);
-        this.randButton = new PlayButton(randomizeButtonSprite, BattleSheep.WIDTH / 2 - randomizeButtonSprite.getWidth() / 2, BattleSheep.HEIGHT / 80);
+        Texture randomizeButtonTexture = new Texture("randomizer.png");
+        Sprite randomizeButtonSprite = new Sprite(randomizeButtonTexture, BattleSheep.WIDTH / 2, BattleSheep.WIDTH / 6);
+        this.randButton = new PlayButton(randomizeButtonSprite, BattleSheep.WIDTH / 2 - randomizeButtonSprite.getWidth() / 2, BattleSheep.HEIGHT / 70);
 
         loadData();
+        git commit -m'improved responsiveness in menu. added new sprites'
 
         this.allData.addAll(placeAnimalSprites);
         this.allData.add(playButton.getButton());
