@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Array;
 
 import g11.mygdx.game.BattleSheep;
+import g11.mygdx.game.PlayServices;
 import g11.mygdx.game.modules.Button;
 import g11.mygdx.game.modules.NoButton;
 import g11.mygdx.game.modules.YesButton;
@@ -16,10 +17,11 @@ public class ConfirmationState implements IState {
     private Sprite confirmationScreen;
     private Button yesButton;
     private Button noButton;
+    private PlayServices action;
     private Array<Sprite> sprites = new Array<Sprite>();
 
-    public ConfirmationState(String previousState) {
-
+    public ConfirmationState(String previousState, PlayServices action) {
+        this.action = action;
         this.previousState = previousState;
         this.nextState = "menuState";
 
@@ -42,6 +44,7 @@ public class ConfirmationState implements IState {
 
     public String confirmUserChoice(float x, float y) {
         if (this.yesButton.isClicked(x, y)) {
+            action.onLeaveClicked();
             return "menuState";
         }
         if (this.noButton.isClicked(x, y)) {

@@ -17,17 +17,22 @@ public class MenuState implements IState {
     private Button quickGame;
     private Button matchMaking;
     private PlayServices action;
+    private float[] formerData;
     // MAKE ALL THE STATES
 
     public MenuState(PlayServices actionResolver){
         this.action = actionResolver;
         this.menuSprites = new Array<Sprite>();
+        this.formerData = new float[2];
         loadData();
     }
     @Override
     public String parseInput(float[] data){
         if (data == null) {return "menuState";}
-
+        if(data == formerData){
+            return "menuState";
+        }
+        formerData = data;
         if (this.signIn.isClicked(data[0], data[1])) {
             action.signIn();
             return "menuState";
@@ -43,7 +48,6 @@ public class MenuState implements IState {
         }
 
         if (this.matchMaking.isClicked(data[0], data[1])){
-            action.unlockAchievement("CgkIiJTL5d0KEAIQBA");
             action.onStartMatchClicked();
             return "menuState";
         }

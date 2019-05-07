@@ -158,4 +158,9 @@ public class BattleSheep extends ApplicationAdapter implements PlayServices{
 	public boolean isSignedIn() {
 		return false;
 	}
+
+	@Override
+	public void onLeaveClicked() {
+
+	}
 }

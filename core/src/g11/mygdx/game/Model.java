@@ -30,7 +30,7 @@ public class Model {
         this.previousState = "menuState";
         this.nextState = "";
         this.currentMode = "loadingState";
-        this.confirmationState = new ConfirmationState(this.previousState);
+        this.confirmationState = new ConfirmationState(this.previousState, actionResolver);
 
 
     }

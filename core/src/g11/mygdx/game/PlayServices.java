@@ -20,6 +20,6 @@ public interface PlayServices
     public void showScore();
     public void showLevel();
     public boolean isSignedIn();
-
+    public void onLeaveClicked();
 }
 

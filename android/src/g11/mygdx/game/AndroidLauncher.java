@@ -5,8 +5,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -15,11 +18,17 @@ import android.widget.Toast;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesCallbackStatusCodes;
 import com.google.android.gms.games.GamesClient;
@@ -42,7 +51,7 @@ import com.google.example.games.basegameutils.GameHelper;
 
 import java.util.ArrayList;
 
-public class AndroidLauncher extends AndroidApplication implements PlayServices {
+public class AndroidLauncher extends AndroidApplication implements GoogleApiClient.OnConnectionFailedListener, PlayServices {
 	//private ActionResolverAndroid actionResolverAndroid;
 	private GameHelper gameHelper;
 
@@ -51,7 +60,9 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 
 	public static final String TAG = "AndroidLauncher";
 
-
+	// Account
+	private GoogleSignInAccount account = null;
+	private Player mPlayer;
 	// Client used to sign in with Google APIs
 	private GoogleSignInClient mGoogleSignInClient = null;
 
@@ -85,7 +96,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 
 	// -------------------------------------------------------
 
-
+	private GoogleApiClient googleApiClient;
 
 
 
@@ -114,7 +125,9 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 		// Create the Google API Client with access to Games
 		// Create the client used to sign in.
 		mGoogleSignInClient = GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
-		startSignInIntent();
+		GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN).requestEmail().build();
+		googleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(new FragmentActivity(),this).addApi(Auth.GOOGLE_SIGN_IN_API,gso).build();
+		//startSignInIntent();
 		/*
 		mDataView = findViewById(R.id.data_view);
 		mTurnTextView = findViewById(R.id.turn_counter_view);
@@ -126,6 +139,29 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 	// Check the sample to ensure all placeholder ids are are updated with real-world values.
 	// This is strictly for the purpose of the samples; you don't need this in a production
 	// application.
+
+	public void handleResult(GoogleSignInResult result) {
+		if (result.isSuccess()) {
+
+			account = result.getSignInAccount();
+			Gdx.app.log("------> signIn()","signed in to account: "+ account.getEmail() );
+			Games.getPlayersClient(this, account)
+					.getCurrentPlayer()
+					.addOnSuccessListener(
+							new OnSuccessListener<Player>() {
+								@Override
+								public void onSuccess(Player player) {
+									mPlayer = player;
+									Gdx.app.log("------> signIn()", "getCurrentPlayer success. PlayerName: "+ mPlayer.getDisplayName() + " PlayerID: "+ mPlayer.getPlayerId());
+
+								}
+							}
+					);
+		}
+	}
+
+
+
 	private void checkPlaceholderIds() {
 		StringBuilder problems = new StringBuilder();
 
@@ -257,7 +293,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 							public void onSuccess(Player player) {
 								mDisplayName = player.getDisplayName();
 								mPlayerId = player.getPlayerId();
-
+								Gdx.app.log("onConnected","playername: " + mDisplayName + ", id: " + mPlayerId);
 								//setViewVisibility();
 							}
 						}
@@ -292,15 +328,15 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 		// This is *NOT* required; if you do not register a handler for
 		// invitation events, you will get standard notifications instead.
 		// Standard notifications may be preferable behavior in many cases.
-		/*
+
 		mInvitationsClient.registerInvitationCallback(mInvitationCallback);
-		*/
+
 		// Likewise, we are registering the optional MatchUpdateListener, which
 		// will replace notifications you would get otherwise. You do *NOT* have
 		// to register a MatchUpdateListener.
-		/*
+
 		mTurnBasedMultiplayerClient.registerTurnBasedMatchUpdateCallback(mMatchUpdateCallback);
-		*/
+
 	}
 
 	private void onDisconnected() {
@@ -317,6 +353,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 	// Add it to any task and in the case of an failure, it will report the string in an alert
 	// dialog.
 	private OnFailureListener createFailureListener(final String string) {
+		Gdx.app.log(TAG, "------> " + string);
 		return new OnFailureListener() {
 			@Override
 			public void onFailure(@NonNull Exception e) {
@@ -662,10 +699,11 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 
 			Task<GoogleSignInAccount> task =
 					GoogleSignIn.getSignedInAccountFromIntent(intent);
-
 			try {
 				GoogleSignInAccount account = task.getResult(ApiException.class);
 				onConnected(account);
+				GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(intent);
+				handleResult(result);
 			} catch (ApiException apiException) {
 				String message = apiException.getMessage();
 				if (message == null || message.isEmpty()) {
@@ -938,6 +976,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 		// Handle notification events.
 		@Override
 		public void onInvitationReceived(@NonNull Invitation invitation) {
+			Gdx.app.log(TAG, "Invitation recieved!!");
 			Toast.makeText(
 					AndroidLauncher.this,
 					"An invitation has arrived from "
@@ -1010,7 +1049,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 
 	// ------------------------------------------
 
-
+/*
 
 	@Override
 	public void rateGame() {
@@ -1164,10 +1203,9 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 		super.onActivityResult(requestCode, resultCode, data);
 		gameHelper.onActivityResult(requestCode, resultCode, data);
 	}
-	*/
+
 	@Override
 	public void signIn() {
-		unlockAchievement("CgkIiJTL5d0KEAIQBA" );
 		try {
 			runOnUiThread(new Runnable() {
 				@Override
@@ -1194,7 +1232,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 			Gdx.app.log("MainActivity", "Log out failed: " + e.getMessage() + ".");
 		}
 	}
-    /*
+    */
 	@Override
 	public void rateGame() {
 		String str = "Your PlayStore Link";
@@ -1223,7 +1261,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 	@Override
 	public void showAchievement() {
 		if (isSignedIn()) {
-			startActivityForResult(Games.Achievements.getAchievementsIntent(gameHelper.getApiClient()), requestCode);
+			startActivityForResult(Games.Achievements.getAchievementsIntent(gameHelper.getApiClient()), RC_SIGN_IN);
 		} else {
 			signIn();
 		}
@@ -1232,7 +1270,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 	@Override
 	public void showScore() {
 		if (isSignedIn()) {
-			startActivityForResult(Games.Leaderboards.getLeaderboardIntent(gameHelper.getApiClient(), "CgkIiJTL5d0KEAIQAQ"), requestCode);
+			startActivityForResult(Games.Leaderboards.getLeaderboardIntent(gameHelper.getApiClient(), "CgkIiJTL5d0KEAIQAQ"), RC_SIGN_IN);
 		} else {
 			signIn();
 		}
@@ -1241,7 +1279,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 	@Override
 	public void showLevel() {
 		if (isSignedIn()) {
-			startActivityForResult(Games.Leaderboards.getLeaderboardIntent(gameHelper.getApiClient(), "CgkIiJTL5d0KEAIQAQ"), requestCode);
+			startActivityForResult(Games.Leaderboards.getLeaderboardIntent(gameHelper.getApiClient(), "CgkIiJTL5d0KEAIQAQ"), RC_SIGN_IN);
 		} else {
 			signIn();
 		}
@@ -1251,7 +1289,60 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 	public boolean isSignedIn() {
 		return gameHelper.isSignedIn();
 	}
+
+
+
+	@Override
+	public void signIn() {
+		if (account == null){
+			Intent intent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
+			startActivityForResult(intent,RC_SIGN_IN);
+		}else {
+			Gdx.app.log("------> signIn()","already signed in to: "+account.getEmail());
+		}
+
+	}
+
+	@Override
+	public void signOut() {
+		if (account != null) {
+			googleApiClient.connect();
+			googleApiClient.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+				@Override
+				public void onConnected(@Nullable Bundle bundle) {
+					if(googleApiClient.isConnected()) {
+						Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(new ResultCallback<Status>() {
+							@Override
+							public void onResult(@NonNull Status status) {
+								if (status.isSuccess()) {
+									//got NullPointerException without this
+									if (account != null ){
+										Gdx.app.log("------> signOut()","Signed out from account: "+account.getEmail());
+										account = null;
+									}
+								}
+							}
+						});
+					}
+				}
+				@Override
+				public void onConnectionSuspended(int i) {
+					Gdx.app.log("------> signOut()", "Google API Client Connection Suspended");
+				}
+			});
+
+		}else {
+			Gdx.app.log("------> signOut()", "already signed out");
+		}
+
+
+	}
+
+	@Override
+	public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+		Gdx.app.log("------> onConnectionFailed()",connectionResult.getErrorMessage());
+	}
 }
-*/
-}
+
+
 
