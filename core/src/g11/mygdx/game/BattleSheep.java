@@ -37,6 +37,7 @@ public class BattleSheep extends ApplicationAdapter {
 			BattleSheep.HEIGHT = Gdx.graphics.getHeight();
 
 		}
+
 		localActionActionResolver.signIn();
 
 		delta = Gdx.graphics.getDeltaTime();

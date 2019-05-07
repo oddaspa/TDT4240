@@ -45,7 +45,7 @@ import g11.mygdx.game.modules.SignInButton;
             }
             if (this.quickGame.isClicked(data[0], data[1])){
                 if (action.isSignedIn()) {
-                    action.createMatch();
+                    action.onQuickMatchClicked();
                     return "placeAnimalState";
                 }else {
                     Gdx.app.log("------> MenuState", "tried to play while signed out");

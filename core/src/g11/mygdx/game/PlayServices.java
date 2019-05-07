@@ -12,7 +12,7 @@ public interface PlayServices
     public void showScore();
     public void showLevel();
     public boolean isSignedIn();
-    public void createMatch();
+    public void onQuickMatchClicked();
     public void onStartMatchClicked();
     public void onDoneClicked();
     public void writeData(byte[] string);

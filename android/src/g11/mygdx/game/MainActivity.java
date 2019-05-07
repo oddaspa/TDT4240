@@ -20,6 +20,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.games.Games;
@@ -29,6 +30,7 @@ import com.google.android.gms.games.Player;
 import com.google.android.gms.games.TurnBasedMultiplayerClient;
 import com.google.android.gms.games.multiplayer.Invitation;
 import com.google.android.gms.games.multiplayer.InvitationCallback;
+import com.google.android.gms.games.multiplayer.Invitations;
 import com.google.android.gms.games.multiplayer.Multiplayer;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
@@ -45,6 +47,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     private GoogleApiClient googleApiClient;
     private static final int REQ_CODE = 9001;
     private static final int RC_SELECT_PLAYERS = 10000;
+    private final static int RC_LOOK_AT_MATCHES = 10001;
     private GoogleSignInAccount account= null;
 
     // Client used to interact with the TurnBasedMultiplayer system.
@@ -124,6 +127,8 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         if (result.isSuccess()) {
             account = result.getSignInAccount();
             Gdx.app.log("------> signIn()","signed in to account: "+ account.getEmail() );
+            mTurnBasedMultiplayerClient = Games.getTurnBasedMultiplayerClient(this, account);
+            mInvitationsClient = Games.getInvitationsClient(this, account);
             Games.getPlayersClient(this, account)
                     .getCurrentPlayer()
                     .addOnSuccessListener(
@@ -136,7 +141,32 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                                 }
                             }
                     );
-        }
+            // Retrieve the TurnBasedMatch from the connectionHint
+            GamesClient gamesClient = Games.getGamesClient(this, account);
+            gamesClient.getActivationHint()
+                    .addOnSuccessListener(new OnSuccessListener<Bundle>() {
+                        @Override
+                        public void onSuccess(Bundle hint) {
+                            if (hint != null) {
+                                Invitation inv = hint.getParcelable(Multiplayer.EXTRA_INVITATION);
+                                Gdx.app.log("-----> getActivationHint()", "invited by: "+inv.getInviter().getDisplayName());
+                                TurnBasedMatch match = hint.getParcelable(Multiplayer.EXTRA_TURN_BASED_MATCH);
+                                Gdx.app.log("------> signIn()","received non-null hint");
+                                if (match != null) {
+                                    mMatch = match;
+                                    updateMatch();
+                                }
+                            }
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Gdx.app.log("signIn()","There was a problem getting the activation hint!");
+                        }
+                    });
+
+        }else{Gdx.app.log("------> handleResult()", "not succsess");}
     }
 
 
@@ -147,6 +177,24 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         if (requestCode == REQ_CODE) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleResult(result);
+        } else if (requestCode == RC_LOOK_AT_MATCHES) {
+            // Returning from the 'Select Match' dialog
+            Gdx.app.log("------> onActivityResult()", "RC_LOOK_AT_MATCHES");
+            if (resultCode != Activity.RESULT_OK) {
+                Gdx.app.log("------> RC_LOOK_AT_MATCHES",
+                        "User cancelled returning from the 'Select Match' dialog.");
+                return;
+            }
+
+            TurnBasedMatch match = data
+                    .getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH);
+
+            if (match != null) {
+                mMatch = match;
+                updateMatch();
+            }
+
+            Gdx.app.log("------> onActivityResult()", "Match = " + match);
         }
 
         else if (requestCode == RC_SELECT_PLAYERS) {
@@ -169,8 +217,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
             int maxAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS, 0);
 
             if (minAutoMatchPlayers > 0) {
-                autoMatchCriteria = RoomConfig.createAutoMatchCriteria(minAutoMatchPlayers,
-                        maxAutoMatchPlayers, 0);
+                autoMatchCriteria = RoomConfig.createAutoMatchCriteria(minAutoMatchPlayers, maxAutoMatchPlayers, 0);
             } else {
                 autoMatchCriteria = null;
             }
@@ -194,7 +241,6 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                             Gdx.app.log("------> RC_SELECT_PLAYERS","There was a problem creating a match!");
                         }
                     });
-            //showSpinner();
         }
 
     }
@@ -217,8 +263,6 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     // and figure out what to do.
     @Override
     public void onStartMatchClicked() {
-        mTurnBasedMultiplayerClient = Games.getTurnBasedMultiplayerClient(this, account);
-        mInvitationsClient = Games.getInvitationsClient(this, account);
         mTurnBasedMultiplayerClient.getSelectOpponentsIntent(1, 1, true)
                 .addOnSuccessListener(new OnSuccessListener<Intent>() {
                     @Override
@@ -235,48 +279,13 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     }
 
     @Override
-    public void createMatch() {
-        mTurnBasedMultiplayerClient = Games.getTurnBasedMultiplayerClient(this, account);
-        mInvitationsClient = Games.getInvitationsClient(this, account);
-        Gdx.app.log("------> createMatch()", "Connection successful");
+    // Create a one-on-one automatch game.
+    public void onQuickMatchClicked() {
 
-        // Retrieve the TurnBasedMatch from the connectionHint
-        GamesClient gamesClient = Games.getGamesClient(this, account);
-        gamesClient.getActivationHint()
-                .addOnSuccessListener(new OnSuccessListener<Bundle>() {
-                    @Override
-                    public void onSuccess(Bundle hint) {
-                        if (hint != null) {
-                            TurnBasedMatch match = hint.getParcelable(Multiplayer.EXTRA_TURN_BASED_MATCH);
-                            Gdx.app.log("------> createMatch()", "getActivationHint successful");
-                            if (match != null) {
-                                updateMatch();
-                                Gdx.app.log("------> createMatch()", "updateMatch!");
-                            }
-                        }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Gdx.app.log("------> createMatch()", "getActivationHint FAILURE!");
-            }
-        });
-        // This is *NOT* required; if you do not register a handler for
-        // invitation events, you will get standard notifications instead.
-        // Standard notifications may be preferable behavior in many cases.
-        mInvitationsClient.registerInvitationCallback(mInvitationCallback);
-
-        // Likewise, we are registering the optional MatchUpdateListener, which
-        // will replace notifications you would get otherwise. You do *NOT* have
-        // to register a MatchUpdateListener.
-        mTurnBasedMultiplayerClient.registerTurnBasedMatchUpdateCallback(mMatchUpdateCallback);
-
-        // Create a one-on-one automatch game.
         Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(1, 1, 0);
 
         TurnBasedMatchConfig turnBasedMatchConfig = TurnBasedMatchConfig.builder()
                 .setAutoMatchCriteria(autoMatchCriteria).build();
-
 
         // Start the match
         mTurnBasedMultiplayerClient.createMatch(turnBasedMatchConfig)
@@ -284,16 +293,15 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                     @Override
                     public void onSuccess(TurnBasedMatch turnBasedMatch) {
                         onInitiateMatch(turnBasedMatch);
-                        Gdx.app.log("------> createMatch()","createMatch SUCCESS");
+
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Gdx.app.log("------> createMatch()","There was a problem creating a match!");
+                        Gdx.app.log("onQuickMatchClicked()","There was a problem creating a match!");
                     }
                 });
-
     }
 
 
@@ -307,8 +315,10 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
 
     private void onInitiateMatch(TurnBasedMatch match) {
         mMatch = match;
+        Gdx.app.log("------> onInitiateMatch()","matchID: "+mMatch.getMatchId());
         if (match.getData() != null) {
             // This is a game that has already started, so I'll just start
+            Gdx.app.log("------> onInitiateMatch()","This is a game that has already started, so I'll just start");
             updateMatch();
             return;
         }
@@ -345,12 +355,12 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         // Create the next turn
         mTurnData.turnCounter += 1;
         //mTurnData.data = new String(mMatch.getData());
-
         mTurnBasedMultiplayerClient.takeTurn(mMatch.getMatchId(),
                 mTurnData.persist(), nextParticipantId)
                 .addOnSuccessListener(new OnSuccessListener<TurnBasedMatch>() {
                     @Override
                     public void onSuccess(TurnBasedMatch turnBasedMatch) {
+                        Gdx.app.log("onDoneClicked()","matchID: "+mMatch.getMatchId());
                         onUpdateMatch(turnBasedMatch);
                     }
                 })
@@ -391,6 +401,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
             return;
         }
     }
+
 
     // If you choose to rematch, then call it and wait for a response.
     public void rematch() {
@@ -516,7 +527,8 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         switch (turnStatus) {
             case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
                 mTurnData = SkeletonTurn.unpersist(mMatch.getData());
-                Gdx.app.log("------> updateMatch()","write code to take turn here");
+                Gdx.app.log("------> updateMatch()","?? opponent ID = "+mMatch.getDescriptionParticipant().getDisplayName());
+                Gdx.app.log("------> updateMatch()","YOUR TURN.. write code to take turn here");
                 return;
             case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN:
                 // Should return results.
