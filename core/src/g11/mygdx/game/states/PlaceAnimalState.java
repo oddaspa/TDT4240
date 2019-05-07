@@ -149,7 +149,7 @@ public class PlaceAnimalState implements IState{
             boardRow = new String(result);
             board += boardRow + "\n";
         }
-        action.writeData(board.getBytes());
+        action.writeBoard(board.getBytes());
     }
 
 

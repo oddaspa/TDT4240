@@ -15,9 +15,10 @@ public interface PlayServices
     public void onQuickMatchClicked();
     public void onStartMatchClicked();
     public void onDoneClicked();
-    public void writeData(byte[] string);
+    public void writeData(byte[] str);
     public void onFinishClicked();
-    public String retrieveData();
+    public String[] retrieveData();
     public String getmDisplayName();
+    public void writeBoard(byte[] str);
 }
 

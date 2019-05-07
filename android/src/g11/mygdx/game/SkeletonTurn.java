@@ -19,6 +19,7 @@ package g11.mygdx.game;
 
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,7 +35,7 @@ public class SkeletonTurn {
 
     public static final String TAG = "EBTurn";
 
-    public String data = "";
+    public JSONObject data = new JSONObject();
     public int turnCounter;
 
     public SkeletonTurn() {
@@ -60,31 +61,35 @@ public class SkeletonTurn {
     }
 
     // Creates a new instance of SkeletonTurn.
-    static public SkeletonTurn unpersist(byte[] byteArray) {
-
-        if (byteArray == null) {
+    static public SkeletonTurn unpersist(byte[] byteArray, byte[] byteArray2) {
+        JSONObject obj = new JSONObject();
+        if (byteArray == null && byteArray2 == null) {
             Log.d(TAG, "Empty array---possible bug.");
             return new SkeletonTurn();
         }
-
-        String st = null;
+        String st1 = null;
+        String st2 = null;
         try {
-            st = new String(byteArray, "UTF-8");
+            st1 = new String(byteArray, "UTF-8");
+            obj.put("p_1", st1);
+            st2 = new String(byteArray2, "UTF-8");
+            obj.put("p_2", st2);
         } catch (UnsupportedEncodingException e1) {
             e1.printStackTrace();
             return null;
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
-        Log.d(TAG, "====UNPERSIST \n" + st);
 
         SkeletonTurn retVal = new SkeletonTurn();
 
         try {
-            JSONObject obj = new JSONObject();
-            obj.put("data", st);
-
-            if (obj.has("data")) {
-                retVal.data = obj.getString("data");
+            if (obj.has("p_1")) {
+                retVal.data.put("p_1", obj.get("p_1"));
+            }
+            if (obj.has("p_2")) {
+                retVal.data.put("p_2", obj.get("p_2"));
             }
             if (obj.has("turnCounter")) {
                 retVal.turnCounter = obj.getInt("turnCounter");
