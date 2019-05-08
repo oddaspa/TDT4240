@@ -1,5 +1,6 @@
 package g11.mygdx.game.states;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Array;
@@ -104,19 +105,16 @@ public class PlaceAnimalState implements IState{
     public String goToGame(){
         boolean allAnimalsPlaced = true;
         for (int i = 65; i < this.placeAnimalSprites.size; i++){
-            if (this.placeAnimalSprites.get(i).getY() < 221){
+            if (this.placeAnimalSprites.get(i).getY() < (float) ( 1 + BattleSheep.HEIGHT * 0.325)){
                 allAnimalsPlaced = false;
             }
         }
-
         if (allAnimalsPlaced){
             this.turnBoardToFile();
             action.onDoneClicked();
             return "inGameStatus";
         }else{
-            this.placeAnimalMessages.removeIndex(0);
-            placeAnimalMessages.add("Place all animals to continue..");
-            placeAnimalMessages.reverse();
+            Gdx.app.log("--------------> goToGame()","place all animals");
             return "placeAnimalState";
         }
     }

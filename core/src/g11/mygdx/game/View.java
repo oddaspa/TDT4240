@@ -62,7 +62,7 @@ public class View extends Screen {
             sb.draw(s.getTexture(), Math.round(s.getX()),Math.round(s.getY()), s.getWidth(), s.getHeight());
         }
         BitmapFont font = new BitmapFont();
-        font.getData().setScale(2);
+        font.getData().setScale(4);
         font.setColor(Color.BLACK);
         if(msgs != null){
             font.draw(sb, msgs.get(0),BattleSheep.WIDTH/6, (float) (BattleSheep.HEIGHT * 0.9));

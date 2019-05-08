@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
@@ -61,6 +62,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     private Player mPlayer;
     // Should I be showing the turn API?
     public boolean isDoingTurn = false;
+    AlertDialog.Builder alertDialogBuilder;
 
 
 
@@ -70,6 +72,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         config.useImmersiveMode = true;
         initialize(new BattleSheep(this), config);
+        alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN).requestEmail().build();
         //nå har jeg bare lagt inn en fragmentActivity.... denne klassen skulle egentlig extendet fragmentActivity
@@ -122,9 +125,8 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         }
     }
 
-    public void showDialog(String title, String message) {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
 
+    public void showDialog(String title, String message) {
         // set title
         alertDialogBuilder.setTitle(title);
         // set message and positive button
@@ -135,6 +137,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                         dialog.dismiss();
                     }
                 });
+
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
@@ -158,6 +161,10 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                                 }
                             }
                     );
+            // Likewise, we are registering the optional MatchUpdateListener, which
+            // will replace notifications you would get otherwise. You do *NOT* have
+            // to register a MatchUpdateListener.
+            mTurnBasedMultiplayerClient.registerTurnBasedMatchUpdateCallback(mMatchUpdateCallback);
             /*
             mTurnBasedMultiplayerClient.getInboxIntent()
                     .addOnSuccessListener(new OnSuccessListener<Intent>() {
@@ -356,15 +363,10 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
             mTurnData = new SkeletonTurn();
             // This is a game that has already started, so I'll just start
             Gdx.app.log("------> onInitiateMatch()","This is a game that has already started, so I'll just start");
-
-            SkeletonTurn preexistingData = new SkeletonTurn();
             try {
                 byte[] data = mMatch.getData();
-                Gdx.app.log("--------p_1 slice", new String(Arrays.copyOfRange(data, 16, 88)));
-                Gdx.app.log("--------p_2 slice", new String(Arrays.copyOfRange(data, 97, 169)));
-                Gdx.app.log("Data from mMatch.getdata()", new String(data));
-                preexistingData.data.put("p_1", new String(Arrays.copyOfRange(data, 16, 88)));
-                preexistingData.data.put("p_2", new String(Arrays.copyOfRange(data, 97, 169)));
+                mTurnData.data.put("p_1", new String(Arrays.copyOfRange(data, 16, 88)));
+                mTurnData.data.put("p_2", new String(Arrays.copyOfRange(data, 97, 169)));
                 /*
                 if (mMatch.getParticipantId(mPlayer.getPlayerId()).equals("p_1")) {
                     preexistingData.data.put("p_1", new String(Arrays.copyOfRange(data, 15, 88)));
@@ -374,11 +376,10 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                     preexistingData.data.put("p_1", new String(Arrays.copyOfRange(data, 108, 185)));
                 }
                 */
-                Gdx.app.log("-----------------preexisting data: ",preexistingData.data.toString());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            mTurnData.data = preexistingData.data;
+
             mTurnData.persist();
             updateMatch();
             return;
@@ -413,6 +414,8 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     public void onDoneClicked() {
 
         String nextParticipantId = getNextParticipantId();
+        Gdx.app.log("-------> onDoneClicked()","next player ID: "+nextParticipantId);
+
         // Create the next turn
         mTurnData.turnCounter += 1;
         //mTurnData.data = new String(mMatch.getData());
@@ -422,7 +425,9 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                     @Override
                     public void onSuccess(TurnBasedMatch turnBasedMatch) {
                         Gdx.app.log("onDoneClicked()","matchID: "+mMatch.getMatchId());
-                        onUpdateMatch(turnBasedMatch);
+                        isDoingTurn = false;
+                        //onUpdateMatch(turnBasedMatch);
+
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -493,11 +498,10 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         if (match.canRematch()) {
             askForRematch();
         }
-
-        isDoingTurn = (match.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN);
+        //isDoingTurn = (match.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN);
         Gdx.app.log("------> onUpdateMatch()" ,"your turn: "+isDoingTurn);
+        mMatch = match;
         if (isDoingTurn) {
-            mMatch = match;
             updateMatch();
             return;
         }
@@ -591,6 +595,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                     public void onSuccess(TurnBasedMatch turnBasedMatch) {
                         mMatch = turnBasedMatch;
                         updateMatch();
+
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -636,7 +641,6 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         // OK, it's active. Check on turn status.
         switch (turnStatus) {
             case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
-
                 String[] gameData = retrieveData();
                 Gdx.app.log("GameData:", "gameData[0]: " + gameData[0] + ", gameData[1]:" + gameData[1]);
                 if(mMatch.getParticipantId(mPlayer.getPlayerId()).equals("p_1")) {
@@ -645,15 +649,16 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                 if(mMatch.getParticipantId(mPlayer.getPlayerId()).equals("p_2")) {
                     mTurnData = SkeletonTurn.unpersist(gameData[1].getBytes(), gameData[0].getBytes());
                 }
-
                 //Gdx.app.log("------> updateMatch()","?? opponent ID = "+mMatch.getDescriptionParticipant().getDisplayName());
                 isDoingTurn = true;
                 return;
+
             case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN:
                 // Should return results.
                 isDoingTurn = false;
                 Gdx.app.log("------> Alas...", "It's not your turn.");
                 break;
+
             case TurnBasedMatch.MATCH_TURN_STATUS_INVITED:
                 Gdx.app.log("------> Good inititative!",
                         "Still waiting for invitations.\n\nBe patient!");
@@ -689,28 +694,21 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     }
 
 
-    private InvitationCallback mInvitationCallback = new InvitationCallback() {
-        // Handle notification events.
-        @Override
-        public void onInvitationReceived(@NonNull Invitation invitation) {
-            Toast.makeText(
-                    MainActivity.this,
-                    "An invitation has arrived from "
-                            + invitation.getInviter().getDisplayName(), Toast.LENGTH_SHORT)
-                    .show();
-        }
-
-        @Override
-        public void onInvitationRemoved(@NonNull String invitationId) {
-            Toast.makeText(MainActivity.this, "An invitation was removed.", Toast.LENGTH_SHORT)
-                    .show();
-        }
-    };
-
     private TurnBasedMatchUpdateCallback mMatchUpdateCallback = new TurnBasedMatchUpdateCallback() {
         @Override
         public void onTurnBasedMatchReceived(@NonNull TurnBasedMatch turnBasedMatch) {
-            Toast.makeText(MainActivity.this, "A match was updated.", Toast.LENGTH_LONG).show();
+            Gdx.app.log("---------> TurnBasedMatchUpdateCallback: ",new String(turnBasedMatch.getData()));
+            isDoingTurn = true;
+            mTurnData = new SkeletonTurn();
+            try {
+                byte[] data = turnBasedMatch.getData();
+                mTurnData.data.put("p_1", new String(Arrays.copyOfRange(data, 16, 88)));
+                mTurnData.data.put("p_2", new String(Arrays.copyOfRange(data, 97, 169)));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            onUpdateMatch(turnBasedMatch);
+            Gdx.app.log("---------> TurnBasedMatchUpdateCallback", "opponent did a move!");
         }
 
         @Override

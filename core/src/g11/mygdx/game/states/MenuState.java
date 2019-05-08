@@ -116,11 +116,11 @@ import g11.mygdx.game.modules.SignInButton;
             // GPGS STUFF
             signInButton = new Sprite(new Texture("login.png"));
             signInButton.setSize(BattleSheep.WIDTH / 4, BattleSheep.HEIGHT / 12);
-            this.signIn = new SignInButton(signInButton,BattleSheep.WIDTH/2 -(signInButton.getWidth()/2),0);
+            this.signIn = new SignInButton(signInButton,BattleSheep.WIDTH/2 -(signInButton.getWidth()),0);
 
             signOutButton = new Sprite(new Texture("logout.png"));
             signOutButton.setSize(BattleSheep.WIDTH / 4, BattleSheep.HEIGHT / 12);
-            this.signOut = new SignInButton(signOutButton,BattleSheep.WIDTH/2 -(signOutButton.getWidth()/2),0);
+            this.signOut = new SignInButton(signOutButton,BattleSheep.WIDTH/2 ,0);
 
             this.menuSprites.add(signOutButton);
         }

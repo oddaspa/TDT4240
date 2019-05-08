@@ -186,17 +186,13 @@ public class InGameState implements IState {
             return;
         }
         String fromFile = action.retrieveData()[1];
-        Gdx.app.log("FromFile", fromFile);
         String[] strings = fromFile.split("Q");
-        Gdx.app.log("strings[0]", strings[0]);
-        Gdx.app.log("strings[1]", strings[1]);
         this.inGameMessages.add("");
         this.inGameMessages.add("Oscar");
         int i = 8;
         int j = 0;
         placeOpponentGrass();
         for(String s : strings) {
-            Gdx.app.log("-----> PlaceOpponentBoard Strings", s);
             //TODO: Fix c == 'x' , c == 'b' && formerRow.toCharArray()[j] == 'b'
             for (char c : s.toCharArray()) {
                 if (c == 'c') {
@@ -258,10 +254,12 @@ public class InGameState implements IState {
     }
 
     private void makeMove(int col, int row){
+        /*
         if(!action.getIsDoingTurn()){
             Gdx.app.log("------> MakeMove()", "Its not your turn!");
             return;
         }else {
+        */
             float[] spritePosition = new float[2];
             float spriteX;
             float spriteY;
@@ -272,7 +270,7 @@ public class InGameState implements IState {
                 spritePosition[0] = spriteX;
                 spritePosition[1] = spriteY;
                 spriteCoordinates = parsePosition(spritePosition);
-                if (row == spriteCoordinates[0] && col == spriteCoordinates[1]) {
+                if (col == spriteCoordinates[0] && row == spriteCoordinates[1]) {
                     if (c instanceof Grass) {
                         Sprite newSprite = ((Grass) c).gotHit();
                         if (newSprite == null) {
@@ -292,9 +290,8 @@ public class InGameState implements IState {
                 }
             }
             writeFile(col, row, 'X');
-            System.out.println("make move");
             action.onDoneClicked();
-        }
+        //}
         if(gameFinished()){
             System.out.println("You won!");
         }
