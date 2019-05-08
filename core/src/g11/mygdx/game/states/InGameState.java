@@ -57,43 +57,12 @@ public class InGameState implements IState {
         }
 
         formerData = data;
-        float[] spritePosition = new float[2];
-        float spriteX;
-        float spriteY;
         double[] coordinates = parsePosition(data);
-        double[] spriteCoordinates;
         if(coordinates[1] != -1){
             if(this.opponentBoard != null){
-                for(Sprite c : this.allSprites){
-                    spriteX = c.getX() + c.getWidth()/2;
-                    spriteY = c.getY() + c.getHeight()/2;
-                    spritePosition[0] = spriteX;
-                    spritePosition[1] = spriteY;
-                    spriteCoordinates = parsePosition(spritePosition);
-                    if(coordinates[0] == spriteCoordinates[0] && coordinates[1] == spriteCoordinates[1]){
-                        if(c instanceof Grass) {
-                            Sprite newSprite= ((Grass) c).gotHit();
-                            if(newSprite == null){
-                                continue;
-                            }
-                            this.opponentBoard.add(newSprite);
-                            if(((Grass) c).hasAnimal()) {
-                                Sprite animal = ((Grass) c).getAnimal();
-                                if (animal instanceof Chicken) {
-                                    ((Chicken) animal).gotHit();
-                                }
-                                if (animal instanceof Sheep) {
-                                    ((Sheep) animal).gotHit();
-                                }
-                            }
-                        }
-                        makeMove((int) coordinates[0], (int) coordinates[1]);
-                    }
-
-                }
+                makeMove((int) coordinates[0], (int) coordinates[1]);
             }
         }
-
         return "inGameStatus";
     }
 
@@ -144,7 +113,6 @@ public class InGameState implements IState {
     }
 
     private void writeFile(int col, int row, char item){
-
         String wordsArray[] = action.retrieveData()[1].split("Q");
         String returnString = new String();
         int i = 8;
@@ -217,13 +185,18 @@ public class InGameState implements IState {
             Gdx.app.log("placeOpponentBoard()", "No board");
             return;
         }
-        String[] fromFile = action.retrieveData()[1].split("Q");
+        String fromFile = action.retrieveData()[1];
+        Gdx.app.log("FromFile", fromFile);
+        String[] strings = fromFile.split("Q");
+        Gdx.app.log("strings[0]", strings[0]);
+        Gdx.app.log("strings[1]", strings[1]);
         this.inGameMessages.add("");
         this.inGameMessages.add("Oscar");
         int i = 8;
         int j = 0;
         placeOpponentGrass();
-        for(String s : fromFile) {
+        for(String s : strings) {
+            Gdx.app.log("-----> PlaceOpponentBoard Strings", s);
             //TODO: Fix c == 'x' , c == 'b' && formerRow.toCharArray()[j] == 'b'
             for (char c : s.toCharArray()) {
                 if (c == 'c') {
@@ -285,8 +258,43 @@ public class InGameState implements IState {
     }
 
     private void makeMove(int col, int row){
-        writeFile(col, row, 'X');
-        System.out.println("make move");
+        if(!action.getIsDoingTurn()){
+            Gdx.app.log("------> MakeMove()", "Its not your turn!");
+            return;
+        }else {
+            float[] spritePosition = new float[2];
+            float spriteX;
+            float spriteY;
+            double[] spriteCoordinates;
+            for(Sprite c : this.allSprites) {
+                spriteX = c.getX() + c.getWidth() / 2;
+                spriteY = c.getY() + c.getHeight() / 2;
+                spritePosition[0] = spriteX;
+                spritePosition[1] = spriteY;
+                spriteCoordinates = parsePosition(spritePosition);
+                if (row == spriteCoordinates[0] && col == spriteCoordinates[1]) {
+                    if (c instanceof Grass) {
+                        Sprite newSprite = ((Grass) c).gotHit();
+                        if (newSprite == null) {
+                            continue;
+                        }
+                        this.opponentBoard.add(newSprite);
+                        if (((Grass) c).hasAnimal()) {
+                            Sprite animal = ((Grass) c).getAnimal();
+                            if (animal instanceof Chicken) {
+                                ((Chicken) animal).gotHit();
+                            }
+                            if (animal instanceof Sheep) {
+                                ((Sheep) animal).gotHit();
+                            }
+                        }
+                    }
+                }
+            }
+            writeFile(col, row, 'X');
+            System.out.println("make move");
+            action.onDoneClicked();
+        }
         if(gameFinished()){
             System.out.println("You won!");
         }

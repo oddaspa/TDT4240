@@ -35,8 +35,8 @@ import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchUpdateCallback;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONException;
 
@@ -174,7 +174,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                             Gdx.app.log("------> handleResult()","error getInboxIntent()");
                         }
                     });
-             */
+            */
             // Retrieve the TurnBasedMatch from the connectionHint
             GamesClient gamesClient = Games.getGamesClient(this, account);
             gamesClient.getActivationHint()
@@ -291,6 +291,10 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         return account != null;
     }
 
+    @Override
+    public boolean getIsDoingTurn(){
+        return isDoingTurn;
+    }
 
     // Open the create-game UI. You will get back an onActivityResult
     // and figure out what to do.
@@ -350,8 +354,33 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         mMatch = match;
         Gdx.app.log("------> onInitiateMatch()","matchID: "+mMatch.getMatchId());
         if (match.getData() != null) {
+            mTurnData = new SkeletonTurn();
             // This is a game that has already started, so I'll just start
             Gdx.app.log("------> onInitiateMatch()","This is a game that has already started, so I'll just start");
+
+            SkeletonTurn preexistingData = new SkeletonTurn();
+            try {
+                byte[] data = mMatch.getData();
+                Gdx.app.log("--------p_1 slice", new String(Arrays.copyOfRange(data, 16, 88)));
+                Gdx.app.log("--------p_2 slice", new String(Arrays.copyOfRange(data, 97, 169)));
+                Gdx.app.log("Data from mMatch.getdata()", new String(data));
+                preexistingData.data.put("p_1", new String(Arrays.copyOfRange(data, 16, 88)));
+                preexistingData.data.put("p_2", new String(Arrays.copyOfRange(data, 97, 169)));
+                /*
+                if (mMatch.getParticipantId(mPlayer.getPlayerId()).equals("p_1")) {
+                    preexistingData.data.put("p_1", new String(Arrays.copyOfRange(data, 15, 88)));
+                    preexistingData.data.put("p_2", new String(Arrays.copyOfRange(data, 108, 185)));
+                } else if(mMatch.getParticipantId(mPlayer.getPlayerId()).equals("p_2")) {
+                    preexistingData.data.put("p_2", new String(Arrays.copyOfRange(data, 15, 88)));
+                    preexistingData.data.put("p_1", new String(Arrays.copyOfRange(data, 108, 185)));
+                }
+                */
+                Gdx.app.log("-----------------preexisting data: ",preexistingData.data.toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            mTurnData.data = preexistingData.data;
+            mTurnData.persist();
             updateMatch();
             return;
         }
@@ -406,21 +435,28 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
 
         //mTurnData = null;
     }
+
     @Override
     public void writeBoard(byte[] str) {
+        String[] data = retrieveData();
         Gdx.app.log("-----> writeBoard()", "player_ID: "+mMatch.getParticipantId(mPlayer.getPlayerId()) + " is writing data");
         if (mMatch.getParticipantId(mPlayer.getPlayerId()).equals("p_1")) {
-            mTurnData = mTurnData.unpersist(str,retrieveData()[1].getBytes());
+            mTurnData = mTurnData.unpersist(str,data[1].getBytes());
         }else if (mMatch.getParticipantId(mPlayer.getPlayerId()).equals("p_2")){
             Gdx.app.log("-----> WriteBoard()", "Writing for real");
             mTurnData = mTurnData.unpersist(retrieveData()[1].getBytes(), str);
         }
-
+            Gdx.app.log("retrieveData in WritingBoard", "retrieveData[0]: " + data[0] + "retrieveData[1]: " + data[1]);
+            Gdx.app.log("WriteBoard", "Writing for real");
+            mTurnData = mTurnData.unpersist(data[1].getBytes(), str);
+            Gdx.app.log("RetrieveData()[1]", data[1]);
+            Gdx.app.log("str", new String(str));
     }
+
 
     @Override
     public void writeData(byte[] str) {
-        Gdx.app.log("-----> writeData()", "player_ID: "+mMatch.getParticipantId(mPlayer.getPlayerId()) + " is writing data");
+        Gdx.app.log("-----> writeData()", "player_ID: " + mMatch.getParticipantId(mPlayer.getPlayerId()) + " is writing data");
         if (mMatch.getParticipantId(mPlayer.getPlayerId()).equals("p_1")) {
             mTurnData = mTurnData.unpersist(retrieveData()[0].getBytes(),str);
         }else if (mMatch.getParticipantId(mPlayer.getPlayerId()).equals("p_2")){
@@ -430,7 +466,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         //mTurnData = mTurnData.unpersist(str);
         //onInitiateMatch(mMatch);
         try{
-            Gdx.app.log("-----> writeData()",mTurnData.data.get("p_2").toString());
+            Gdx.app.log("-----> writeData()",new String((String) mTurnData.data.get("p_1")));
         }catch (JSONException e) {}
 
     }
@@ -449,7 +485,6 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
         return returnData;
     }
     @Override
@@ -535,14 +570,18 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     // callback to OnTurnBasedMatchUpdated(), which will show the game
     // UI.
     public void startMatch() {
-        mTurnData = new SkeletonTurn();
-        // Some basic turn data
-        try {
-            mTurnData.data.put("p_1", "........Q........Q........Q........Q........Q........Q........Q........Q");
-            mTurnData.data.put("p_2", "........Q........Q........Q........Q........Q........Q........Q........Q");
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if(mTurnData == null) {
+            Gdx.app.log("startMatch", "We started the match");
+            mTurnData = new SkeletonTurn();
+            // Some basic turn data
+            try {
+                mTurnData.data.put("p_1", "........Q........Q........Q........Q........Q........Q........Q........Q");
+                mTurnData.data.put("p_2", "........Q........Q........Q........Q........Q........Q........Q........Q");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
+
 
         String myParticipantId = mMatch.getParticipantId(mPlayer.getPlayerId());
         //String myOpponent = mMatch.getParticipantIds().get(1);
@@ -602,7 +641,13 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
             case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
 
                 String[] gameData = retrieveData();
-                mTurnData = SkeletonTurn.unpersist(gameData[0].getBytes(), gameData[1].getBytes());
+                Gdx.app.log("GameData:", "gameData[0]: " + gameData[0] + ", gameData[1]:" + gameData[1]);
+                if(mMatch.getParticipantId(mPlayer.getPlayerId()).equals("p_1")) {
+                    mTurnData = SkeletonTurn.unpersist(gameData[0].getBytes(), gameData[1].getBytes());
+                }
+                if(mMatch.getParticipantId(mPlayer.getPlayerId()).equals("p_2")) {
+                    mTurnData = SkeletonTurn.unpersist(gameData[1].getBytes(), gameData[0].getBytes());
+                }
 
                 //Gdx.app.log("------> updateMatch()","?? opponent ID = "+mMatch.getDescriptionParticipant().getDisplayName());
                 isDoingTurn = true;

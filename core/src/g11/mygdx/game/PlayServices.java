@@ -20,5 +20,6 @@ public interface PlayServices
     public String[] retrieveData();
     public String getmDisplayName();
     public void writeBoard(byte[] str);
+    public boolean getIsDoingTurn();
 }
 
