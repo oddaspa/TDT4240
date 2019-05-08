@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
@@ -29,7 +28,6 @@ import com.google.android.gms.games.InvitationsClient;
 import com.google.android.gms.games.Player;
 import com.google.android.gms.games.TurnBasedMultiplayerClient;
 import com.google.android.gms.games.multiplayer.Invitation;
-import com.google.android.gms.games.multiplayer.InvitationCallback;
 import com.google.android.gms.games.multiplayer.Multiplayer;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
@@ -62,6 +60,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     private Player mPlayer;
     // Should I be showing the turn API?
     public boolean isDoingTurn = false;
+    public boolean hasOpponent = false;
     AlertDialog.Builder alertDialogBuilder;
 
 
@@ -290,6 +289,10 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     }
 
 
+    @Override
+    public String getOpponentName(){
+        return mMatch.getDescriptionParticipant().getDisplayName();
+    }
 
 
     @Override
@@ -302,6 +305,10 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         return isDoingTurn;
     }
 
+    @Override
+    public boolean getHasOpponent(){
+        return hasOpponent;
+    }
     // Open the create-game UI. You will get back an onActivityResult
     // and figure out what to do.
     @Override
@@ -476,6 +483,11 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     public String[] retrieveData(){
         String[] returnData = new String[2];
         try {
+            if(mTurnData == null){
+                returnData[0] = null;
+                returnData[1] = null;
+                return returnData;
+            }
             if (mMatch.getParticipantId(mPlayer.getPlayerId()).equals("p_1")) {
                 returnData[0] = mTurnData.data.get("p_1").toString();
                 returnData[1] = mTurnData.data.get("p_2").toString();
@@ -700,6 +712,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
             Gdx.app.log("---------> TurnBasedMatchUpdateCallback: ",new String(turnBasedMatch.getData()));
             isDoingTurn = true;
             mTurnData = new SkeletonTurn();
+
             try {
                 byte[] data = turnBasedMatch.getData();
                 mTurnData.data.put("p_1", new String(Arrays.copyOfRange(data, 16, 88)));
@@ -708,6 +721,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                 e.printStackTrace();
             }
             onUpdateMatch(turnBasedMatch);
+            hasOpponent = true;
             Gdx.app.log("---------> TurnBasedMatchUpdateCallback", "opponent did a move!");
         }
 

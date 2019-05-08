@@ -28,8 +28,10 @@ public class InGameState implements IState {
     private float BOTTOMBORDER = (float) (1 + BattleSheep.HEIGHT * 0.375);
     float[] formerData;
     private PlayServices action;
+    boolean opponentBoardPlaced;
 
     public InGameState(PlayServices actionResolver){
+        this.opponentBoardPlaced = false;
         this.action = actionResolver;
         this.myBoard = new Array<Sprite>();
         this.opponentBoard = new Array<Sprite>();
@@ -73,6 +75,10 @@ public class InGameState implements IState {
 
     @Override
     public Array<Sprite> serveData() {
+        if(!this.opponentBoardPlaced){
+            Gdx.app.log("ServeData", "Placed new board!");
+            placeOpponentBoard();
+        }
         Array<Sprite> allData = new Array<Sprite>();
         allData.addAll(this.myBoard);
         allData.addAll(this.grassTiles);
@@ -136,7 +142,6 @@ public class InGameState implements IState {
         this.myBoard = new Array<Sprite>();
         String[] fromFile = action.retrieveData()[0].split("Q");
         float rangeY = (BattleSheep.HEIGHT / 4) / 8;
-        this.inGameMessages.add(action.getmDisplayName());
         int i = 8;
         int j = 0;
         for (String s : fromFile) {
@@ -178,6 +183,7 @@ public class InGameState implements IState {
 
     //TODO: USE CORRECT SPRITES
     private void placeOpponentBoard(){
+        Gdx.app.log("xxxxxxx >>placeOpponentBoard in algo", "placing a board");
         String formerRow = "........";
         char formerLetter = '.';
         this.opponentBoard = new Array<Sprite>();
@@ -187,8 +193,14 @@ public class InGameState implements IState {
         }
         String fromFile = action.retrieveData()[1];
         String[] strings = fromFile.split("Q");
-        this.inGameMessages.add("");
-        this.inGameMessages.add("Oscar");
+        if(action.getHasOpponent()) {
+            Gdx.app.log("MAKE MOVE PLACE OPPONENT BOARD!!!", String.valueOf(opponentBoardPlaced));
+            this.inGameMessages.add(action.getOpponentName());
+            this.inGameMessages.add("");
+            this.inGameMessages.add(action.getmDisplayName());
+            this.opponentBoardPlaced = true;
+        }
+
         int i = 8;
         int j = 0;
         placeOpponentGrass();
@@ -197,12 +209,14 @@ public class InGameState implements IState {
             for (char c : s.toCharArray()) {
                 if (c == 'c') {
                     // Chicken
+                    Gdx.app.log("Chicken", "made");
                     Chicken chicken = new Chicken(0, 0);
                     chicken.setPosition(j * (BattleSheep.WIDTH / 10) + 1 + (BattleSheep.WIDTH / 10), (float) ((i - 1) * (BattleSheep.WIDTH / 10) + 1 + BattleSheep.HEIGHT * 0.375));
                     this.opponentBoard.add(chicken);
                     ((Grass) getGrassTile(j + 1,i)).setAnimal(chicken);
                 }
                 if (c == 's' && formerRow.toCharArray()[j] == 's') {
+                    Gdx.app.log("Sheep", "made");
                     if (formerLetter == 's') {
                         formerLetter = '.';
                         Sheep sheep = new Sheep(0, 0);
@@ -229,6 +243,7 @@ public class InGameState implements IState {
         this.opponentBoard.add(bonde);
     }
     private void placeOpponentGrass(){
+        this.grassTiles = new Array<Sprite>();
         for (int i = 0; i<8; i++) {
             for (int j = 0; j <8; j++) {
                 // Grass underneath
@@ -254,17 +269,15 @@ public class InGameState implements IState {
     }
 
     private void makeMove(int col, int row){
-        /*
         if(!action.getIsDoingTurn()){
             Gdx.app.log("------> MakeMove()", "Its not your turn!");
             return;
         }else {
-        */
             float[] spritePosition = new float[2];
             float spriteX;
             float spriteY;
             double[] spriteCoordinates;
-            for(Sprite c : this.allSprites) {
+            for (Sprite c : this.grassTiles) {
                 spriteX = c.getX() + c.getWidth() / 2;
                 spriteY = c.getY() + c.getHeight() / 2;
                 spritePosition[0] = spriteX;
@@ -291,7 +304,7 @@ public class InGameState implements IState {
             }
             writeFile(col, row, 'X');
             action.onDoneClicked();
-        //}
+        }
         if(gameFinished()){
             System.out.println("You won!");
         }

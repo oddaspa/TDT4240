@@ -64,11 +64,12 @@ public class View extends Screen {
         BitmapFont font = new BitmapFont();
         font.getData().setScale(4);
         font.setColor(Color.BLACK);
-        if(msgs != null){
+        if(msgs != null && msgs.size > 2){
             font.draw(sb, msgs.get(0),BattleSheep.WIDTH/6, (float) (BattleSheep.HEIGHT * 0.9));
             font.draw(sb, msgs.get(1),BattleSheep.WIDTH * 5/6, (float) (BattleSheep.HEIGHT * 0.9875));
             font.draw(sb, msgs.get(2),BattleSheep.WIDTH /48, BattleSheep.HEIGHT / 20);
         }
+
         sb.end();
     }
 

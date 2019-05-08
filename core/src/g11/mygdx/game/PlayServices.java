@@ -21,5 +21,7 @@ public interface PlayServices
     public String getmDisplayName();
     public void writeBoard(byte[] str);
     public boolean getIsDoingTurn();
+    public boolean getHasOpponent();
+    public String getOpponentName();
 }
 
