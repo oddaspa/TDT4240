@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
-import android.text.Html;
 import android.widget.Toast;
 
 import com.badlogic.gdx.Gdx;
@@ -441,16 +440,14 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         String[] data = retrieveData();
         Gdx.app.log("-----> writeBoard()", "player_ID: "+mMatch.getParticipantId(mPlayer.getPlayerId()) + " is writing data");
         if (mMatch.getParticipantId(mPlayer.getPlayerId()).equals("p_1")) {
-            mTurnData = mTurnData.unpersist(str,data[1].getBytes());
+            mTurnData = mTurnData.unpersist(str, data[1].getBytes());
         }else if (mMatch.getParticipantId(mPlayer.getPlayerId()).equals("p_2")){
             Gdx.app.log("-----> WriteBoard()", "Writing for real");
-            mTurnData = mTurnData.unpersist(retrieveData()[1].getBytes(), str);
+            mTurnData = mTurnData.unpersist(data[1].getBytes(), str);
         }
             Gdx.app.log("retrieveData in WritingBoard", "retrieveData[0]: " + data[0] + "retrieveData[1]: " + data[1]);
             Gdx.app.log("WriteBoard", "Writing for real");
-            mTurnData = mTurnData.unpersist(data[1].getBytes(), str);
-            Gdx.app.log("RetrieveData()[1]", data[1]);
-            Gdx.app.log("str", new String(str));
+            mTurnData.persist();
     }
 
 
