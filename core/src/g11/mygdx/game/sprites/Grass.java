@@ -1,5 +1,8 @@
 package g11.mygdx.game.sprites;
 
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import java.util.concurrent.ThreadLocalRandom;
@@ -10,8 +13,13 @@ public class Grass extends Sprite{
     Sprite animal;
     boolean hasAnimal;
     boolean isHit;
+    Music animalHit;
+
+
     public Grass (){
         super();
+        animalHit = Gdx.audio.newMusic(Gdx.files.internal("buttonClick.mp3"));
+        animalHit.setVolume(0.5f);
         int rand = ThreadLocalRandom.current().nextInt(1, 4 + 1);
         Texture grass = new Texture("grass-" + rand + ".png");
         this.setTexture(grass);
@@ -28,6 +36,7 @@ public class Grass extends Sprite{
         }
         isHit = true;
         if(hasAnimal){
+            animalHit.play();
             Texture tex = new Texture("blood-1.png");
             Sprite blood = new Sprite(tex, (int) this.getWidth()/2, (int) this.getHeight()/2);
             blood.setPosition(this.getX()+this.getWidth()/4, this.getY()+this.getHeight()/4);

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.text.Html;
 import android.widget.Toast;
 
 import com.badlogic.gdx.Gdx;
@@ -80,6 +81,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     @Override
     public void signIn() {
         if (account == null){
+
             Intent intent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
             startActivityForResult(intent,REQ_CODE);
         }else {
@@ -100,8 +102,8 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                             @Override
                             public void onResult(@NonNull Status status) {
                                 if (status.isSuccess()) {
-                                    //got NullPointerException without this
                                     if (account != null ){
+                                        showDialog("signed out","signed out from: "+account.getEmail());
                                         Gdx.app.log("------> signOut()","Signed out from account: "+account.getEmail());
                                         account = null;
                                     }
@@ -119,8 +121,23 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         }else {
             Gdx.app.log("------> signOut()", "already signed out");
         }
+    }
 
+    public void showDialog(String title, String message) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
 
+        // set title
+        alertDialogBuilder.setTitle(title);
+        // set message and positive button
+        alertDialogBuilder.setMessage(message)
+                .setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // if this button is clicked, close
+                        dialog.dismiss();
+                    }
+                });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
 
@@ -142,6 +159,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                                 }
                             }
                     );
+            /*
             mTurnBasedMultiplayerClient.getInboxIntent()
                     .addOnSuccessListener(new OnSuccessListener<Intent>() {
                         @Override
@@ -156,6 +174,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                             Gdx.app.log("------> handleResult()","error getInboxIntent()");
                         }
                     });
+             */
             // Retrieve the TurnBasedMatch from the connectionHint
             GamesClient gamesClient = Games.getGamesClient(this, account);
             gamesClient.getActivationHint()
@@ -246,7 +265,6 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                         @Override
                         public void onSuccess(TurnBasedMatch turnBasedMatch) {
                             Gdx.app.log("------> RC_SELECT_PLAYERS","Starting match...");
-                            Gdx.app.log("------> RC_SELECT_PLAYERS","initial match-data: "+turnBasedMatch.getData().toString());
                             onInitiateMatch(turnBasedMatch);
                         }
                     })
@@ -390,18 +408,13 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     }
     @Override
     public void writeBoard(byte[] str) {
-        Gdx.app.log("-----> writeData()", "player_ID: "+mMatch.getParticipantId(mPlayer.getPlayerId()) + " is writing data");
+        Gdx.app.log("-----> writeBoard()", "player_ID: "+mMatch.getParticipantId(mPlayer.getPlayerId()) + " is writing data");
         if (mMatch.getParticipantId(mPlayer.getPlayerId()).equals("p_1")) {
             mTurnData = mTurnData.unpersist(str,retrieveData()[1].getBytes());
         }else if (mMatch.getParticipantId(mPlayer.getPlayerId()).equals("p_2")){
-            Gdx.app.log("WriteData", "Writing for real");
+            Gdx.app.log("-----> WriteBoard()", "Writing for real");
             mTurnData = mTurnData.unpersist(retrieveData()[1].getBytes(), str);
         }
-        //mTurnData = mTurnData.unpersist(str);
-        //onInitiateMatch(mMatch);
-        try{
-            Gdx.app.log("-----> writeData()",mTurnData.data.get("p_2").toString());
-        }catch (JSONException e) {}
 
     }
 

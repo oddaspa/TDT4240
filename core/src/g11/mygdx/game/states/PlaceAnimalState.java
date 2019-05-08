@@ -48,7 +48,7 @@ public class PlaceAnimalState implements IState{
         this.randButton = new PlayButton(randomizeButtonSprite, BattleSheep.WIDTH / 2 - randomizeButtonSprite.getWidth() / 2, BattleSheep.HEIGHT / 70);
 
         loadData();
-        git commit -m'improved responsiveness in menu. added new sprites'
+
 
         this.allData.addAll(placeAnimalSprites);
         this.allData.add(playButton.getButton());

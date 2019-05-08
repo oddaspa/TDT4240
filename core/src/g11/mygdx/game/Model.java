@@ -1,5 +1,7 @@
 package g11.mygdx.game;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Array;
 
@@ -19,6 +21,8 @@ public class Model {
     private String previousState;
     private String nextState;
     private PlayServices action;
+
+
     // MAKE ALL THE STATES
 
     public Model(PlayServices actionResolver){
@@ -31,8 +35,6 @@ public class Model {
         this.nextState = "";
         this.currentMode = "loadingState";
         this.confirmationState = new ConfirmationState(this.previousState);
-
-
     }
 
     public void parseInput(float[] data){
@@ -75,6 +77,7 @@ public class Model {
             if (!nextState.equals(this.previousState)) {
                 this.previousState = this.currentMode;
             }
+
             this.currentMode = nextState;
 
         }
@@ -83,6 +86,8 @@ public class Model {
             this.confirmationState.setPreviousState(this.previousState);
         }
     }
+
+
 
     public Array<Sprite> serveData(){
         if(this.currentMode.equals("menuState")){

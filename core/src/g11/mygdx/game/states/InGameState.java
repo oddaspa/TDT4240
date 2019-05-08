@@ -166,7 +166,6 @@ public class InGameState implements IState {
         char formerLetter = '.';
         //RESET
         this.myBoard = new Array<Sprite>();
-        System.out.println("PlaceMyBoard");
         String[] fromFile = action.retrieveData()[0].split("\n");
         float rangeY = (BattleSheep.HEIGHT / 4) / 8;
         this.inGameMessages.add(action.getmDisplayName());
@@ -225,6 +224,7 @@ public class InGameState implements IState {
         int j = 0;
         placeOpponentGrass();
         for(String s : fromFile) {
+            Gdx.app.log("-----> placeOpponentBoard()",s);
             //TODO: Fix c == 'x' , c == 'b' && formerRow.toCharArray()[j] == 'b'
             for (char c : s.toCharArray()) {
                 if (c == 'c') {
