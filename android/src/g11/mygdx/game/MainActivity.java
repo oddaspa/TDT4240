@@ -538,8 +538,8 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         mTurnData = new SkeletonTurn();
         // Some basic turn data
         try {
-            mTurnData.data.put("p_1", "........\n........\n........\n........\n........\n........\n........\n........\n");
-            mTurnData.data.put("p_2", "........\n........\n........\n........\n........\n........\n........\n........\n");
+            mTurnData.data.put("p_1", "........Q........Q........Q........Q........Q........Q........Q........Q");
+            mTurnData.data.put("p_2", "........Q........Q........Q........Q........Q........Q........Q........Q");
         } catch (JSONException e) {
             e.printStackTrace();
         }

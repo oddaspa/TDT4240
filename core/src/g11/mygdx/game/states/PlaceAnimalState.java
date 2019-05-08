@@ -148,7 +148,7 @@ public class PlaceAnimalState implements IState{
             for (int j = 0; j<boardRowAsByteArray.length; j++)
                 result[j] = boardRowAsByteArray[boardRowAsByteArray.length-j-1];
             boardRow = new String(result);
-            board += boardRow + "\n";
+            board += boardRow + "Q";
         }
         action.writeBoard(board.getBytes());
     }

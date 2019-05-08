@@ -145,7 +145,7 @@ public class InGameState implements IState {
 
     private void writeFile(int col, int row, char item){
 
-        String wordsArray[] = action.retrieveData()[1].split("\n");
+        String wordsArray[] = action.retrieveData()[1].split("Q");
         String returnString = new String();
         int i = 8;
         for(String s : wordsArray){
@@ -154,7 +154,7 @@ public class InGameState implements IState {
                 ch[col-1] = item;
                 s = String.valueOf(ch);
             }
-            returnString += s + "\n";
+            returnString += s + "Q";
             i--;
         }
         action.writeData(returnString.getBytes());
@@ -166,7 +166,7 @@ public class InGameState implements IState {
         char formerLetter = '.';
         //RESET
         this.myBoard = new Array<Sprite>();
-        String[] fromFile = action.retrieveData()[0].split("\n");
+        String[] fromFile = action.retrieveData()[0].split("Q");
         float rangeY = (BattleSheep.HEIGHT / 4) / 8;
         this.inGameMessages.add(action.getmDisplayName());
         int i = 8;
@@ -217,14 +217,13 @@ public class InGameState implements IState {
             Gdx.app.log("placeOpponentBoard()", "No board");
             return;
         }
-        String[] fromFile = action.retrieveData()[1].split("\n");
+        String[] fromFile = action.retrieveData()[1].split("Q");
         this.inGameMessages.add("");
         this.inGameMessages.add("Oscar");
         int i = 8;
         int j = 0;
         placeOpponentGrass();
         for(String s : fromFile) {
-            Gdx.app.log("-----> placeOpponentBoard()",s);
             //TODO: Fix c == 'x' , c == 'b' && formerRow.toCharArray()[j] == 'b'
             for (char c : s.toCharArray()) {
                 if (c == 'c') {
@@ -295,7 +294,7 @@ public class InGameState implements IState {
     }
     //TODO: c == 'x' || c == 'b'
     private boolean gameFinished() {
-        String[] fromFile = action.retrieveData()[0].split("\n");
+        String[] fromFile = action.retrieveData()[0].split("Q");
         for (String s : fromFile) {
             for (char c : s.toCharArray()) {
                 if (c == 'c' || c == 's') {
@@ -303,7 +302,7 @@ public class InGameState implements IState {
                 }
             }
         }
-        fromFile = action.retrieveData()[1].split("\n");
+        fromFile = action.retrieveData()[1].split("Q");
         for (String s : fromFile) {
             for (char c : s.toCharArray()) {
                 if (c == 'c' || c == 's') {
