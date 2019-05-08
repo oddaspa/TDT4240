@@ -76,8 +76,13 @@ public class InGameState implements IState {
     @Override
     public Array<Sprite> serveData() {
         if(!this.opponentBoardPlaced){
-            Gdx.app.log("ServeData", "Placed new board!");
-            placeOpponentBoard();
+            if (action.getHasOpponent() || action.isPlayer2()){
+                Gdx.app.log("ServeData", "Placed new board!");
+                placeOpponentBoard();
+            }else if(this.opponentBoard.isEmpty()){
+                placeOpponentBoard();
+            }
+
         }
         Array<Sprite> allData = new Array<Sprite>();
         allData.addAll(this.myBoard);
@@ -186,14 +191,14 @@ public class InGameState implements IState {
         Gdx.app.log("xxxxxxx >>placeOpponentBoard in algo", "placing a board");
         String formerRow = "........";
         char formerLetter = '.';
-        this.opponentBoard = new Array<Sprite>();
         if(action.retrieveData()[1] == null){
             Gdx.app.log("placeOpponentBoard()", "No board");
             return;
         }
+        this.opponentBoard = new Array<Sprite>();
         String fromFile = action.retrieveData()[1];
         String[] strings = fromFile.split("Q");
-        if(action.getHasOpponent()) {
+        if(action.getHasOpponent() || action.isPlayer2()) {
             Gdx.app.log("MAKE MOVE PLACE OPPONENT BOARD!!!", String.valueOf(opponentBoardPlaced));
             this.inGameMessages.add(action.getOpponentName());
             this.inGameMessages.add("");

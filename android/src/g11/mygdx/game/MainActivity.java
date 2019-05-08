@@ -306,6 +306,16 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     }
 
     @Override
+    public boolean isPlayer2(){
+        if(mMatch != null){
+            return mMatch.getParticipantId(mPlayer.getPlayerId()).equals("p_2");
+        }else{
+            return false;
+        }
+
+    }
+
+    @Override
     public boolean getHasOpponent(){
         return hasOpponent;
     }
@@ -721,7 +731,10 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                 e.printStackTrace();
             }
             onUpdateMatch(turnBasedMatch);
-            hasOpponent = true;
+            if(retrieveData()[1] != null){
+                hasOpponent = true;
+            }
+
             Gdx.app.log("---------> TurnBasedMatchUpdateCallback", "opponent did a move!");
         }
 

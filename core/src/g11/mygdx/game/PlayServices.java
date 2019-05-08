@@ -23,5 +23,6 @@ public interface PlayServices
     public boolean getIsDoingTurn();
     public boolean getHasOpponent();
     public String getOpponentName();
+    public boolean isPlayer2();
 }
 
