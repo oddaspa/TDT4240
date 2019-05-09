@@ -29,8 +29,13 @@ public class InGameState implements IState {
     float[] formerData;
     private PlayServices action;
     boolean opponentBoardPlaced;
+    private int turnCounter;
+    private String dots;
+    private Array<Sprite> myGrass;
 
     public InGameState(PlayServices actionResolver){
+        this.dots = ".";
+        this.turnCounter = 0;
         this.opponentBoardPlaced = false;
         this.action = actionResolver;
         this.myBoard = new Array<Sprite>();
@@ -38,6 +43,7 @@ public class InGameState implements IState {
         this.grassTiles = new Array<Sprite>();
         this.allSprites = new Array<Sprite>();
         this.inGameMessages = new Array<String>();
+        this.myGrass = new Array<Sprite>();
         loadData();
         allSprites = this.grassTiles;
         allSprites.addAll(opponentBoard);
@@ -82,8 +88,23 @@ public class InGameState implements IState {
             }else if(this.opponentBoard.isEmpty()){
                 placeOpponentBoard();
             }
-
         }
+        if(turnCounter != action.getTurnCounter()){
+            Gdx.app.log("XXXXXXX>>>> updating myBoard!", "TurnCounter: " + turnCounter);
+            updateMyBoard();
+            turnCounter = action.getTurnCounter();
+        }
+        if(!action.getHasOpponent() && !action.isPlayer2()){
+            this.inGameMessages.clear();
+            if(dots.length() >= 3){
+                dots = "";
+            }
+            dots += ".";
+            this.inGameMessages.add("Searching for opponent" + dots);
+            this.inGameMessages.add("");
+            this.inGameMessages.add(action.getmDisplayName());
+        }
+
         Array<Sprite> allData = new Array<Sprite>();
         allData.addAll(this.myBoard);
         allData.addAll(this.grassTiles);
@@ -140,6 +161,32 @@ public class InGameState implements IState {
 
     }
 
+    private void updateMyBoard(){
+        String[] fromFile = action.retrieveData()[0].split("Q");
+        int row = 0;
+        int col = 0;
+        Gdx.app.log("-----------updateBoard size of MyBoard", String.valueOf(this.myBoard.size));
+        for (String s : fromFile) {
+            // First Row (s) = row 8
+            for (char c : s.toCharArray()) {
+                // Frist col C ) 0
+                if(c == 'X'){
+                    Sprite sprite = this.myGrass.get(col + row * 8);
+                    Gdx.app.log(">>>>>>>in Update ", "Col: " + String.valueOf(col) + ", Row: " + String.valueOf(row));
+                    Sprite newSprite = ((Grass) sprite).gotHit();
+                    if (newSprite == null) {
+                        continue;
+                    }
+                    this.myBoard.add(newSprite);
+                }
+                col++;
+            }
+            row++;
+            col = 0;
+        }
+    }
+
+
     private void placeMyBoard(){
         String formerRow = "........";
         char formerLetter = '.';
@@ -149,12 +196,15 @@ public class InGameState implements IState {
         float rangeY = (BattleSheep.HEIGHT / 4) / 8;
         int i = 8;
         int j = 0;
+        int pos = -1;
         for (String s : fromFile) {
             for (char c : s.toCharArray()) {
+                pos++;
                 // Grass underneath
                 Grass grass = new Grass();
                 grass.setPosition(j * rangeY + 1 + BattleSheep.WIDTH / 4, i * rangeY + 1 + BattleSheep.HEIGHT / 16);
                 this.myBoard.add(grass);
+                this.myGrass.add(grass);
                 if (c == 'c') {
                     // Chicken
                     Texture tex = new Texture("chicken-liten.png");
@@ -170,6 +220,10 @@ public class InGameState implements IState {
                         Sprite sheep = new Sprite(tex, Math.round(rangeY * 2) - 2, Math.round(rangeY * 2) - 2);
                         sheep.setPosition((j - 1)  * rangeY + 1 + BattleSheep.WIDTH / 4, i * rangeY + 1 + BattleSheep.HEIGHT / 16);
                         this.myBoard.add(sheep);
+                        grass.setAnimal(sheep);
+                        ((Grass) this.myGrass.get(pos - 1)).setAnimal(sheep);
+                        ((Grass) this.myGrass.get(pos - 8)).setAnimal(sheep);
+                        ((Grass) this.myGrass.get(pos - 9)).setAnimal(sheep);
                     } else {
                         formerLetter = 's';
                     }
@@ -199,7 +253,7 @@ public class InGameState implements IState {
         String fromFile = action.retrieveData()[1];
         String[] strings = fromFile.split("Q");
         if(action.getHasOpponent() || action.isPlayer2()) {
-            Gdx.app.log("MAKE MOVE PLACE OPPONENT BOARD!!!", String.valueOf(opponentBoardPlaced));
+            this.inGameMessages.clear();
             this.inGameMessages.add(action.getOpponentName());
             this.inGameMessages.add("");
             this.inGameMessages.add(action.getmDisplayName());
@@ -214,14 +268,12 @@ public class InGameState implements IState {
             for (char c : s.toCharArray()) {
                 if (c == 'c') {
                     // Chicken
-                    Gdx.app.log("Chicken", "made");
                     Chicken chicken = new Chicken(0, 0);
                     chicken.setPosition(j * (BattleSheep.WIDTH / 10) + 1 + (BattleSheep.WIDTH / 10), (float) ((i - 1) * (BattleSheep.WIDTH / 10) + 1 + BattleSheep.HEIGHT * 0.375));
                     this.opponentBoard.add(chicken);
                     ((Grass) getGrassTile(j + 1,i)).setAnimal(chicken);
                 }
                 if (c == 's' && formerRow.toCharArray()[j] == 's') {
-                    Gdx.app.log("Sheep", "made");
                     if (formerLetter == 's') {
                         formerLetter = '.';
                         Sheep sheep = new Sheep(0, 0);
@@ -265,7 +317,7 @@ public class InGameState implements IState {
         for(Sprite g : this.grassTiles){
             tilePos[0] = g.getX() + g.getWidth()/2;
             tilePos[1] = g.getY() + g.getHeight()/2;
-            double[] position= parsePosition(tilePos);
+            double[] position = parsePosition(tilePos);
             if(position[0] == (double) col &&  position[1] == (double) row){
                 return g;
             }

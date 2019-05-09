@@ -61,6 +61,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     // Should I be showing the turn API?
     public boolean isDoingTurn = false;
     public boolean hasOpponent = false;
+    public int turnCounter = 0;
     AlertDialog.Builder alertDialogBuilder;
 
 
@@ -306,6 +307,11 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     }
 
     @Override
+    public int getTurnCounter(){
+        return turnCounter;
+    }
+
+    @Override
     public boolean isPlayer2(){
         if(mMatch != null){
             return mMatch.getParticipantId(mPlayer.getPlayerId()).equals("p_2");
@@ -366,7 +372,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
 
 
     private void onDisconnected() {
-        Gdx.app.log("------> onDissconnected()", "onDisconnected()");
+        Gdx.app.log("------> onDisconnected()", "onDisconnected()");
 
         mTurnBasedMultiplayerClient = null;
         mInvitationsClient = null;
@@ -417,7 +423,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Gdx.app.log("------> onFinnishedClicked()","There was a problem finishing the match!");
+                        Gdx.app.log("------> onFinishedClicked()","There was a problem finishing the match!");
                     }
                 });
 
@@ -431,7 +437,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     public void onDoneClicked() {
 
         String nextParticipantId = getNextParticipantId();
-        Gdx.app.log("-------> onDoneClicked()","next player ID: "+nextParticipantId);
+        Gdx.app.log("-------> onDoneClicked()","next player ID: " + nextParticipantId);
 
         // Create the next turn
         mTurnData.turnCounter += 1;
@@ -450,7 +456,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Gdx.app.log("------> onDoneCklicked()","There was a problem taking a turn!");
+                        Gdx.app.log("------> onDoneClicked()","There was a problem taking a turn!");
                     }
                 });
 
@@ -664,7 +670,6 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         switch (turnStatus) {
             case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
                 String[] gameData = retrieveData();
-                Gdx.app.log("GameData:", "gameData[0]: " + gameData[0] + ", gameData[1]:" + gameData[1]);
                 if(mMatch.getParticipantId(mPlayer.getPlayerId()).equals("p_1")) {
                     mTurnData = SkeletonTurn.unpersist(gameData[0].getBytes(), gameData[1].getBytes());
                 }
@@ -733,6 +738,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
             onUpdateMatch(turnBasedMatch);
             if(retrieveData()[1] != null){
                 hasOpponent = true;
+                turnCounter ++;
             }
 
             Gdx.app.log("---------> TurnBasedMatchUpdateCallback", "opponent did a move!");

@@ -1,18 +1,16 @@
 package g11.mygdx.game;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Array;
 
 import g11.mygdx.game.states.ConfirmationState;
 import g11.mygdx.game.states.InGameState;
-import g11.mygdx.game.states.MenuState;
 import g11.mygdx.game.states.LoadingState;
+import g11.mygdx.game.states.MenuState;
 import g11.mygdx.game.states.PlaceAnimalState;
 
 public class Model {
-    private String currentMode;
+    public String currentMode;
     private MenuState menu;
     private LoadingState loading;
     private PlaceAnimalState placeAnimal;
