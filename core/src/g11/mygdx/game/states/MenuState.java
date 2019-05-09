@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import g11.mygdx.game.BattleSheep;
 import g11.mygdx.game.PlayServices;
 import g11.mygdx.game.modules.Button;
+import g11.mygdx.game.modules.HomeButton;
 import g11.mygdx.game.modules.SignInButton;
 
     public class MenuState implements IState {
@@ -18,10 +19,16 @@ import g11.mygdx.game.modules.SignInButton;
         private Button signOut;
         private Button quickGame;
         private Button matchMaking;
+        private Button soundButton;
         private PlayServices action;
         private float[] formerData;
         private Sprite signInButton;
         private Sprite signOutButton;
+        public Music music = Gdx.audio.newMusic(Gdx.files.internal("backgroundMusic.mp3"));
+        private static Texture soundTexture = new Texture("sound.png");
+        private static Texture soundOffTexture = new Texture("nosound.png");
+
+
         // MAKE ALL THE STATES
 
         public MenuState(PlayServices actionResolver){
@@ -29,6 +36,10 @@ import g11.mygdx.game.modules.SignInButton;
             this.menuSprites = new Array<Sprite>();
             this.formerData = new float[2];
             loadData();
+            music.setLooping(true);
+            music.setVolume(0.6f);
+            music.play();
+
         }
         @Override
         public String parseInput(float[] data){
@@ -46,6 +57,16 @@ import g11.mygdx.game.modules.SignInButton;
                 return "menuState";
             }
             formerData = data;
+            if (this.soundButton.isClicked(data[0],data[1])) {git add
+                if (music.getVolume() == 0.6f){
+                    music.setVolume(0f);
+                    soundButton.getButton().setTexture(soundOffTexture);
+                }else{
+                    music.setVolume(0.6f);
+                    soundButton.getButton().setTexture(soundTexture);
+                }
+
+            }
             if (menuSprites.get(3) == signInButton && this.signIn.isClicked(data[0], data[1])) {
                 action.signIn();
                 return "menuState";
@@ -122,6 +143,12 @@ import g11.mygdx.game.modules.SignInButton;
             signOutButton.setSize(BattleSheep.WIDTH / 4, BattleSheep.HEIGHT / 12);
             this.signOut = new SignInButton(signOutButton,BattleSheep.WIDTH/2 ,0);
 
+
+            Sprite soundSprite = new Sprite(soundTexture, BattleSheep.WIDTH / 8, BattleSheep.WIDTH / 8);
+            this.soundButton = new HomeButton(soundSprite, (float) BattleSheep.WIDTH/15, BattleSheep.HEIGHT - soundSprite.getHeight()- 50);
+
+
             this.menuSprites.add(signOutButton);
+            this.menuSprites.add(soundButton.getButton());
         }
     }
