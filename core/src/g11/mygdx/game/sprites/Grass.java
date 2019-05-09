@@ -29,7 +29,6 @@ public class Grass extends Sprite{
         this.hasAnimal = false;
         this.isHit = false;
     }
-
     public Sprite gotHit(){
         if(isHit){
             return null;
@@ -55,7 +54,9 @@ public class Grass extends Sprite{
         return ".";
     }
 
-
+    public boolean isHit(){
+        return isHit;
+    }
     public void setAnimal(Sprite animal){
         this.hasAnimal = true;
         this.animal = animal;

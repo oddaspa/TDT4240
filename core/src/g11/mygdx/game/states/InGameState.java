@@ -1,7 +1,6 @@
 package g11.mygdx.game.states;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Array;
@@ -137,15 +136,8 @@ public class InGameState implements IState {
         return output;
     }
 
-    public String[] readFile(String file) {
-        FileHandle handle = Gdx.files.local(file);
-        String text = handle.readString();
-        String wordsArray[] = text.split("\\r?\\n");
-        return wordsArray;
-    }
-
-    private void writeFile(int col, int row, char item){
-        String wordsArray[] = action.retrieveData()[1].split("Q");
+    private void writeFile(String[] file, int col, int row, char item){
+        String wordsArray[] = file;
         String returnString = new String();
         int i = 8;
         for(String s : wordsArray){
@@ -165,13 +157,14 @@ public class InGameState implements IState {
         String[] fromFile = action.retrieveData()[0].split("Q");
         int row = 0;
         int col = 0;
-        Gdx.app.log("-----------updateBoard size of MyBoard", String.valueOf(this.myBoard.size));
+
         for (String s : fromFile) {
-            // First Row (s) = row 8
             for (char c : s.toCharArray()) {
-                // Frist col C ) 0
                 if(c == 'X'){
                     Sprite sprite = this.myGrass.get(col + row * 8);
+                    if(((Grass)sprite).isHit()){
+                        continue;
+                    }
                     Gdx.app.log(">>>>>>>in Update ", "Col: " + String.valueOf(col) + ", Row: " + String.valueOf(row));
                     Sprite newSprite = ((Grass) sprite).gotHit();
                     if (newSprite == null) {
@@ -242,7 +235,6 @@ public class InGameState implements IState {
 
     //TODO: USE CORRECT SPRITES
     private void placeOpponentBoard(){
-        Gdx.app.log("xxxxxxx >>placeOpponentBoard in algo", "placing a board");
         String formerRow = "........";
         char formerLetter = '.';
         if(action.retrieveData()[1] == null){
@@ -264,7 +256,6 @@ public class InGameState implements IState {
         int j = 0;
         placeOpponentGrass();
         for(String s : strings) {
-            //TODO: Fix c == 'x' , c == 'b' && formerRow.toCharArray()[j] == 'b'
             for (char c : s.toCharArray()) {
                 if (c == 'c') {
                     // Chicken
@@ -327,9 +318,11 @@ public class InGameState implements IState {
 
     private void makeMove(int col, int row){
         if(!action.getIsDoingTurn()){
-            Gdx.app.log("------> MakeMove()", "Its not your turn!");
+            this.inGameMessages.set(1, "It is not your turn!" );
             return;
         }else {
+            String[] data = action.retrieveData();
+            this.inGameMessages.set(1, "");
             float[] spritePosition = new float[2];
             float spriteX;
             float spriteY;
@@ -359,17 +352,18 @@ public class InGameState implements IState {
                     }
                 }
             }
-            writeFile(col, row, 'X');
+            writeFile(data[1].split("Q"), col, row, 'X');
             action.onDoneClicked();
+            if(gameFinished(data)){
+                System.out.println("You won!");
+            }
         }
-        if(gameFinished()){
-            System.out.println("You won!");
-        }
+
 
     }
     //TODO: c == 'x' || c == 'b'
-    private boolean gameFinished() {
-        String[] fromFile = action.retrieveData()[0].split("Q");
+    private boolean gameFinished(String[] data) {
+        String[] fromFile = data[0].split("Q");
         for (String s : fromFile) {
             for (char c : s.toCharArray()) {
                 if (c == 'c' || c == 's') {
@@ -377,7 +371,7 @@ public class InGameState implements IState {
                 }
             }
         }
-        fromFile = action.retrieveData()[1].split("Q");
+        fromFile = data[1].split("Q");
         for (String s : fromFile) {
             for (char c : s.toCharArray()) {
                 if (c == 'c' || c == 's') {
