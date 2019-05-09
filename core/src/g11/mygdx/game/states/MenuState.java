@@ -57,7 +57,7 @@ import g11.mygdx.game.modules.SignInButton;
                 return "menuState";
             }
             formerData = data;
-            if (this.soundButton.isClicked(data[0],data[1])) {git add
+            if (this.soundButton.isClicked(data[0],data[1])) {
                 if (music.getVolume() == 0.6f){
                     music.setVolume(0f);
                     soundButton.getButton().setTexture(soundOffTexture);
