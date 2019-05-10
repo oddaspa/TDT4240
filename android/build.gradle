@@ -17,7 +17,7 @@ android {
         exclude 'META-INF/robovm/ios/robovm.xml'
     }
     defaultConfig {
-        applicationId "battlesheep2.progark"
+        applicationId "battlesheep.progark"
         minSdkVersion 15
         targetSdkVersion 28
         versionCode 1

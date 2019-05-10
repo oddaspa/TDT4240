@@ -22,7 +22,12 @@ public class Controller extends InputListener {
 
         }else if(theModel.currentMode.equals("loadingState")){
             theModel.parseInput(coordinates);
-        }else{
+        }else if(theModel.currentMode.equals("menuState")){
+            theModel.parseInput(coordinates);
+            theModel.parseInput(coordinates);
+            theModel.parseInput(coordinates);
+        }
+        else{
             if(coordinates != null){
                 if(Math.abs(coordinates[0] - this.previousCoordinates[0]) > 3 && Math.abs(coordinates[1] - this.previousCoordinates[1]) > 3){
                     theModel.parseInput(coordinates);

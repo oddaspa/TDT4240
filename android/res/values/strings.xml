@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">BattleSheep II</string>
-    <string name="app_id">666048089753</string>
+    <string name="app_name">BattleSheep</string>
+    <string name="app_id">368774924808</string>
     <integer name="google_play_services_version">12451000</integer>
 
 </resources>

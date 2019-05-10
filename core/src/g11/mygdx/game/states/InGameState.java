@@ -163,7 +163,7 @@ public class InGameState implements IState {
 
     private void updateMyBoard(){
         //reset throw animation
-        myBoard.get(myBoard.size-1).setTexture(player);
+        myBoard.get(70).setTexture(player);
         spear.setSize(0,0);
 
         String[] fromFile = action.retrieveData()[0].split("Q");
@@ -335,8 +335,13 @@ public class InGameState implements IState {
             this.inGameMessages.set(1, "It is not your turn!" );
             return;
         }else {
+            if (((Grass) this.grassTiles.get(col-1 + ((row-1)*8))).isHit()){
+                this.inGameMessages.set(1, "You already made this move!" );
+                return;
+            }
             //change to throw sprite
-            myBoard.get(myBoard.size-1).setTexture(playerThrow);
+            Gdx.app.log("se her!!!!!!!-----------","index: "+(myBoard.size-1));
+            myBoard.get(70).setTexture(playerThrow);
             String[] data = action.retrieveData();
             this.inGameMessages.set(1, "");
             float[] spritePosition = new float[2];
@@ -355,7 +360,7 @@ public class InGameState implements IState {
                         spear.setPosition(c.getX() + c.getWidth()/2 - 13, c.getY() - c.getHeight() - 10);
                         Sprite newSprite = ((Grass) c).gotHit();
                         if (newSprite == null) {
-                            continue;
+                            break;
                         }
                         this.opponentBoard.add(newSprite);
                         if (((Grass) c).hasAnimal()) {
