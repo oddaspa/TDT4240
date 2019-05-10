@@ -34,6 +34,7 @@ public class InGameState implements IState {
     private String dots;
     private Array<Sprite> myGrass;
     private Sprite spear;
+    private Texture player2 = new Texture("bonde-liten2.png");
     private Texture player = new Texture("bonde-liten.png");
     private Texture playerThrow = new Texture("bonde-liten-kast.png");
 
@@ -165,31 +166,33 @@ public class InGameState implements IState {
         //reset throw animation
         myBoard.get(70).setTexture(player);
         spear.setSize(0,0);
-
-        String[] fromFile = action.retrieveData()[0].split("Q");
+        String[] data = action.retrieveData();
+        String[] fromFile = data[0].split("Q");
         int row = 0;
         int col = 0;
+        int index = 0;
         for (String s : fromFile) {
             for (char c : s.toCharArray()) {
                 if(c == 'X'){
-                    Sprite sprite = this.myGrass.get(col + row * 8);
-                    if( ( (Grass)sprite ).isHit() ){
-                        continue;
+                    Sprite sprite = this.myGrass.get(index);
+                    Gdx.app.log("____----______------>>>updateMyBoard()","c: "+c+", c==X, and index: "+(index));
+                    if( !( (Grass)sprite ).isHit() ){
+                        Sprite newSprite = ((Grass) sprite).gotHit();
+                        this.myBoard.add(newSprite);
                     }
-                    Gdx.app.log(">>>>>>>in Update ", "Col: " + String.valueOf(col) + ", Row: " + String.valueOf(row));
-                    Sprite newSprite = ((Grass) sprite).gotHit();
-                    if (newSprite == null) {
-                        Gdx.app.log(">>>>>>>in Update ", "newSprite == null");
-                        continue;
-                    }
-                    this.myBoard.add(newSprite);
+                    //Gdx.app.log(">>>>>>>in Update ", "Col: " + String.valueOf(col) + ", Row: " + String.valueOf(row));
+
                 }
                 col++;
+                index ++;
             }
 
             row++;
             col = 0;
         }
+        gameFinished(data);
+
+
     }
 
 
@@ -300,8 +303,8 @@ public class InGameState implements IState {
             j = 0;
             i--;
         }
-        Sprite bonde = new Sprite(player,player.getWidth()/2,player.getHeight()/2);
-        bonde.setPosition(BattleSheep.WIDTH / 8, (float) (BattleSheep.HEIGHT * 0.875));
+        Sprite bonde = new Sprite(player2,player2.getWidth(),player2.getHeight());
+        bonde.setPosition(BattleSheep.WIDTH / 6, (float) (BattleSheep.HEIGHT * 0.875));
         this.opponentBoard.add(bonde);
     }
     private void placeOpponentGrass(){
@@ -377,9 +380,6 @@ public class InGameState implements IState {
             }
             writeFile(data[1].split("Q"), col, row, 'X');
             action.onDoneClicked();
-            if(gameFinished(data)){
-                System.out.println("You won!");
-            }
         }
         /*
         float delta_x = spear.getX() - (float) (BattleSheep.WIDTH * 0.7);
@@ -410,7 +410,9 @@ public class InGameState implements IState {
                 }
             }
         }
-        action.onFinishClicked();
+        action.askForRematch();
+        //action.onFinishClicked();
+        System.out.println("You won!");
         return true;
     }
 

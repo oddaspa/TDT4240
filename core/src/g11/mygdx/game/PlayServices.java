@@ -25,5 +25,6 @@ public interface PlayServices
     public String getOpponentName();
     public boolean isPlayer2();
     public int getTurnCounter();
+    public void askForRematch();
 }
 

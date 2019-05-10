@@ -248,7 +248,6 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
 
             // get the invitee list
             ArrayList<String> invitees = data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
-            Gdx.app.log("------> onActivityResult()", "invitee = " + invitees.get(0));
             // get automatch criteria
             Bundle autoMatchCriteria;
 
@@ -385,7 +384,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         if (match.getData() != null) {
             mTurnData = new SkeletonTurn();
             // This is a game that has already started, so I'll just start
-            Gdx.app.log("------> onInitiateMatch()","This is a game that has already started, so I'll just start");
+            Gdx.app.log("------> onInitiateMatch()","This is a game that has already started, so I'll just join");
             try {
                 byte[] data = mMatch.getData();
                 mTurnData.data.put("p_1", new String(Arrays.copyOfRange(data, 16, 88)));
@@ -418,6 +417,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                     @Override
                     public void onSuccess(TurnBasedMatch turnBasedMatch) {
                         onUpdateMatch(turnBasedMatch);
+                        Gdx.app.log("------> onFinishedClicked()","Match finished!");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -447,7 +447,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                 .addOnSuccessListener(new OnSuccessListener<TurnBasedMatch>() {
                     @Override
                     public void onSuccess(TurnBasedMatch turnBasedMatch) {
-                        Gdx.app.log("-------------------------------------->onDoneClicked()","you took a turn - matchID: "+mMatch.getMatchId());
+                        Gdx.app.log("-------> onDoneClicked()","you took a turn");
                         isDoingTurn = false;
                         //onUpdateMatch(turnBasedMatch);
 
@@ -466,15 +466,11 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     @Override
     public void writeBoard(byte[] str) {
         String[] data = retrieveData();
-        Gdx.app.log("-----> writeBoard()", "player_ID: "+mMatch.getParticipantId(mPlayer.getPlayerId()) + " is writing data");
         if (mMatch.getParticipantId(mPlayer.getPlayerId()).equals("p_1")) {
             mTurnData = mTurnData.unpersist(str, data[1].getBytes());
         }else if (mMatch.getParticipantId(mPlayer.getPlayerId()).equals("p_2")){
-            Gdx.app.log("-----> WriteBoard()", "Writing for real");
             mTurnData = mTurnData.unpersist(data[1].getBytes(), str);
         }
-            Gdx.app.log("retrieveData in WritingBoard", "retrieveData[0]: " + data[0] + "retrieveData[1]: " + data[1]);
-            Gdx.app.log("WriteBoard", "Writing for real");
             mTurnData.persist();
     }
 
@@ -490,10 +486,6 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
         }
         //mTurnData = mTurnData.unpersist(str);
         //onInitiateMatch(mMatch);
-        try{
-            Gdx.app.log("-----> writeData()",new String((String) mTurnData.data.get("p_1")));
-        }catch (JSONException e) {}
-
     }
     @Override
     public String[] retrieveData(){
@@ -696,6 +688,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     }
 
     // Rematch dialog
+    @Override
     public void askForRematch() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
@@ -714,6 +707,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
+                                onFinishClicked();
                             }
                         });
 
