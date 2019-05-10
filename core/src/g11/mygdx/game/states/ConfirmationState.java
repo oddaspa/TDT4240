@@ -54,6 +54,7 @@ public class ConfirmationState implements IState {
 
     public String confirmUserChoice(float x, float y) {
         if (this.yesButton.isClicked(x, y)) {
+            menu.getAction().onFinishClicked();
             return "menuState";
         }
         if (this.noButton.isClicked(x, y)) {

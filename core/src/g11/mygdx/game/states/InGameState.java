@@ -394,11 +394,13 @@ public class InGameState implements IState {
     }
     //TODO: c == 'x' || c == 'b'
     private boolean gameFinished(String[] data) {
+        boolean youWon = true;
+        boolean youLost = true;
         String[] fromFile = data[0].split("Q");
         for (String s : fromFile) {
             for (char c : s.toCharArray()) {
                 if (c == 'c' || c == 's') {
-                    return false;
+                    youLost = false;
                 }
             }
         }
@@ -406,14 +408,25 @@ public class InGameState implements IState {
         for (String s : fromFile) {
             for (char c : s.toCharArray()) {
                 if (c == 'c' || c == 's') {
-                    return false;
+                    youWon = false;
                 }
             }
         }
-        action.askForRematch();
-        //action.onFinishClicked();
-        System.out.println("You won!");
-        return true;
+        if (youWon){
+            this.inGameMessages.set(1,"Congratz, You Won!");
+            Gdx.app.log("xxxxxxxxxxxxxxxx GameFinished", "Congratz! You Won!");
+            action.onFinishClicked();
+            return true;
+
+        }
+        if (youLost){
+            this.inGameMessages.set(1,"Better Luck Next Time, You Lost!");
+            Gdx.app.log("xxxxxxxxxxxxxxxx GameFinished", "Better Luck Next Time! You Lost!");
+            action.onFinishClicked();
+            return true;
+
+        }
+        return false;
     }
 
 }

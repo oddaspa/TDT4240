@@ -416,7 +416,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                 .addOnSuccessListener(new OnSuccessListener<TurnBasedMatch>() {
                     @Override
                     public void onSuccess(TurnBasedMatch turnBasedMatch) {
-                        onUpdateMatch(turnBasedMatch);
+                        //onUpdateMatch(turnBasedMatch);
                         Gdx.app.log("------> onFinishedClicked()","Match finished!");
                     }
                 })
@@ -690,7 +690,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     // Rematch dialog
     @Override
     public void askForRematch() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         alertDialogBuilder.setMessage("Do you want a rematch?");
 
@@ -707,6 +707,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
+                                dialog.dismiss();
                                 onFinishClicked();
                             }
                         });

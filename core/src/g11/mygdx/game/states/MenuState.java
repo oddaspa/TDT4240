@@ -18,7 +18,7 @@ import g11.mygdx.game.modules.SignInButton;
         private Button signIn;
         private Button signOut;
         private Button quickGame;
-        private Button matchMaking;
+        //private Button matchMaking;
         private Button soundButton;
         private PlayServices action;
         private float[] formerData;
@@ -44,12 +44,12 @@ import g11.mygdx.game.modules.SignInButton;
         @Override
         public String parseInput(float[] data){
             if (action.isSignedIn()){
-                if (menuSprites.get(3) == signInButton){
-                    menuSprites.set(3,signOutButton);
+                if (menuSprites.get(2) == signInButton){
+                    menuSprites.set(2,signOutButton);
                 }
             }else {
-                if (menuSprites.get(3) == signOutButton){
-                    menuSprites.set(3,signInButton);
+                if (menuSprites.get(2) == signOutButton){
+                    menuSprites.set(2,signInButton);
                 }
             }
             if (data == null) {return "menuState";}
@@ -67,27 +67,20 @@ import g11.mygdx.game.modules.SignInButton;
                 }
 
             }
-            if (menuSprites.get(3) == signInButton && this.signIn.isClicked(data[0], data[1])) {
+
+            if (menuSprites.get(2) == signInButton && this.signIn.isClicked(data[0], data[1])) {
                 action.signIn();
                 return "menuState";
             }
 
-            if (menuSprites.get(3) == signOutButton && this.signOut.isClicked(data[0], data[1])) {
+            if (menuSprites.get(2) == signOutButton && this.signOut.isClicked(data[0], data[1])) {
                 action.signOut();
+                Gdx.app.log("------> MenuState", "tried to sign out..");
                 return "menuState";
             }
             if (this.quickGame.isClicked(data[0], data[1])){
                 if (action.isSignedIn()) {
                     action.onQuickMatchClicked();
-                    return "placeAnimalState";
-                }else {
-                    Gdx.app.log("------> MenuState", "tried to play while signed out");
-                }
-            }
-
-            if (this.matchMaking.isClicked(data[0], data[1])){
-                if (action.isSignedIn()) {
-                    action.onStartMatchClicked();
                     return "placeAnimalState";
                 }else {
                     Gdx.app.log("------> MenuState", "tried to play while signed out");
@@ -109,39 +102,38 @@ import g11.mygdx.game.modules.SignInButton;
         public void loadData(){
             Texture bg = new Texture("background2.jpg");
             Sprite background = new Sprite(bg);
-            background.setPosition(-15,5);
+            background.setPosition(-20,-50);
             background.setSize(BattleSheep.WIDTH,BattleSheep.HEIGHT);
         /*
         Texture playBtn = new Texture("quick_game.png");
         Sprite startButton = new Sprite(playBtn);
         startButton.setSize(2 * BattleSheep.WIDTH / 3, BattleSheep.HEIGHT / 4);
         startButton.setPosition(BattleSheep.WIDTH / 6,(BattleSheep.HEIGHT *2 / 7));
-        */
+
             Texture challengeBtn = new Texture("challenge_friend.png");
             Sprite challengeButton = new Sprite(challengeBtn);
             challengeButton.setSize(2 * BattleSheep.WIDTH / 3, BattleSheep.HEIGHT / 6);
             this.matchMaking = new SignInButton(challengeButton, BattleSheep.WIDTH/2 - (challengeButton.getWidth()/2), BattleSheep.HEIGHT / 8);
-
+*/
 
 
 
             Texture quickTex = new Texture("quick_game.png");
             Sprite quickGameButton = new Sprite(quickTex);
             quickGameButton.setSize(2 * BattleSheep.WIDTH / 3, BattleSheep.HEIGHT / 6);
-            this.quickGame = new SignInButton(quickGameButton,BattleSheep.WIDTH/2 - (quickGameButton.getWidth()/2), (BattleSheep.HEIGHT *2 / 6));
+            this.quickGame = new SignInButton(quickGameButton,BattleSheep.WIDTH/2 - (quickGameButton.getWidth()/2),(float) (BattleSheep.HEIGHT *2 / 8));
 
             this.menuSprites.add(background);
             this.menuSprites.add(quickGameButton);
-            this.menuSprites.add(challengeButton);
 
             // GPGS STUFF
             signInButton = new Sprite(new Texture("login.png"));
-            signInButton.setSize(BattleSheep.WIDTH / 4, BattleSheep.HEIGHT / 12);
-            this.signIn = new SignInButton(signInButton,BattleSheep.WIDTH/2 -(signInButton.getWidth()),0);
+            signInButton.setSize(BattleSheep.WIDTH / 4, BattleSheep.WIDTH / 8);
+            this.signIn = new SignInButton(signInButton,BattleSheep.WIDTH - BattleSheep.WIDTH/15 - signInButton.getWidth(),BattleSheep.HEIGHT - signInButton.getHeight()- 50);
 
             signOutButton = new Sprite(new Texture("logout.png"));
-            signOutButton.setSize(BattleSheep.WIDTH / 4, BattleSheep.HEIGHT / 12);
-            this.signOut = new SignInButton(signOutButton,BattleSheep.WIDTH/2 ,0);
+            signOutButton.setSize(BattleSheep.WIDTH / 4, BattleSheep.WIDTH / 8);
+            this.signOut = new SignInButton(signOutButton,BattleSheep.WIDTH - BattleSheep.WIDTH/15 - signOutButton.getWidth() ,BattleSheep.HEIGHT - signOutButton.getHeight()- 50);
 
 
             Sprite soundSprite = new Sprite(soundTexture, BattleSheep.WIDTH / 8, BattleSheep.WIDTH / 8);
@@ -151,4 +143,9 @@ import g11.mygdx.game.modules.SignInButton;
             this.menuSprites.add(signOutButton);
             this.menuSprites.add(soundButton.getButton());
         }
+
+        public PlayServices getAction(){
+            return this.action;
+        }
     }
+

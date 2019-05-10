@@ -24,8 +24,7 @@ public class Controller extends InputListener {
             theModel.parseInput(coordinates);
         }else if(theModel.currentMode.equals("menuState")){
             theModel.parseInput(coordinates);
-            theModel.parseInput(coordinates);
-            theModel.parseInput(coordinates);
+
         }
         else{
             if(coordinates != null){
