@@ -68,6 +68,7 @@ public class View extends Screen {
             font.draw(sb, msgs.get(0),BattleSheep.WIDTH/5, (float) (BattleSheep.HEIGHT * 0.9));
             font.draw(sb, msgs.get(1),BattleSheep.WIDTH * 5/6, (float) (BattleSheep.HEIGHT * 0.9875));
             font.draw(sb, msgs.get(2),(float) ((BattleSheep.WIDTH * 0.35)), BattleSheep.HEIGHT / 16);
+
         }
 
         sb.end();
