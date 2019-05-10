@@ -43,7 +43,7 @@ public class Grass extends Sprite{
             this.animal.setAlpha(1f);
             return blood;
         } else {
-            Texture tex = new Texture("quick_game.png");
+            Texture tex = new Texture("grass-hit.png");
             Sprite ground = new Sprite(tex, (int) this.getWidth(), (int) this.getHeight());
             ground.setPosition(this.getX(), this.getY());
             return ground;
@@ -55,6 +55,9 @@ public class Grass extends Sprite{
         return ".";
     }
 
+    public boolean isHit() {
+        return this.isHit;
+    }
 
     public void setAnimal(Sprite animal){
         this.hasAnimal = true;

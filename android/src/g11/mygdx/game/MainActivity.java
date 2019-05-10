@@ -447,7 +447,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                 .addOnSuccessListener(new OnSuccessListener<TurnBasedMatch>() {
                     @Override
                     public void onSuccess(TurnBasedMatch turnBasedMatch) {
-                        Gdx.app.log("onDoneClicked()","matchID: "+mMatch.getMatchId());
+                        Gdx.app.log("-------------------------------------->onDoneClicked()","you took a turn - matchID: "+mMatch.getMatchId());
                         isDoingTurn = false;
                         //onUpdateMatch(turnBasedMatch);
 
@@ -724,6 +724,7 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
     private TurnBasedMatchUpdateCallback mMatchUpdateCallback = new TurnBasedMatchUpdateCallback() {
         @Override
         public void onTurnBasedMatchReceived(@NonNull TurnBasedMatch turnBasedMatch) {
+            Gdx.app.log("---------> TurnBasedMatchUpdateCallback", "opponent did a move!");
             Gdx.app.log("---------> TurnBasedMatchUpdateCallback: ",new String(turnBasedMatch.getData()));
             isDoingTurn = true;
             mTurnData = new SkeletonTurn();
@@ -740,13 +741,11 @@ public class MainActivity extends AndroidApplication implements  GoogleApiClient
                 hasOpponent = true;
                 turnCounter ++;
             }
-
-            Gdx.app.log("---------> TurnBasedMatchUpdateCallback", "opponent did a move!");
         }
 
         @Override
         public void onTurnBasedMatchRemoved(@NonNull String matchId) {
-            Toast.makeText(MainActivity.this, "A match was removed.", Toast.LENGTH_SHORT).show();
+            Gdx.app.log("---------> TurnBasedMatchUpdateCallback","onTurnBasedMatchRemoved");
         }
     };
 

@@ -13,6 +13,8 @@ import g11.mygdx.game.sprites.Chicken;
 import g11.mygdx.game.sprites.Grass;
 import g11.mygdx.game.sprites.Sheep;
 
+import static com.badlogic.gdx.math.MathUtils.atan2;
+
 public class InGameState implements IState {
     private Array<Sprite> opponentBoard;
     private Array<Sprite> myBoard;
@@ -32,6 +34,9 @@ public class InGameState implements IState {
     private int turnCounter;
     private String dots;
     private Array<Sprite> myGrass;
+    private Sprite spear;
+    private Texture player = new Texture("bonde-liten.png");
+    private Texture playerThrow = new Texture("bonde-liten-kast.png");
 
     public InGameState(PlayServices actionResolver){
         this.dots = ".";
@@ -51,6 +56,8 @@ public class InGameState implements IState {
         Texture homeButtonTexture = new Texture("home.png");
         Sprite homeButtonSprite = new Sprite(homeButtonTexture, BattleSheep.WIDTH / 10, BattleSheep.WIDTH / 10);
         this.homeButton = new HomeButton(homeButtonSprite, (float) BattleSheep.WIDTH / 48, (float) BattleSheep.HEIGHT - BattleSheep.HEIGHT / 80 - homeButtonSprite.getHeight());
+        this.spear = new Sprite(new Texture("spear.png"),0,0);
+        spear.setPosition((float) (BattleSheep.WIDTH * 0.7),BattleSheep.HEIGHT/8);
     }
 
 
@@ -110,6 +117,7 @@ public class InGameState implements IState {
         allData.addAll(this.grassTiles);
         allData.addAll(this.opponentBoard);
         allData.add(this.homeButton.getButton());
+        allData.add(this.spear);
         return allData;
     }
 
@@ -162,25 +170,33 @@ public class InGameState implements IState {
     }
 
     private void updateMyBoard(){
+        //reset throw animation
+        myBoard.get(myBoard.size-1).setTexture(player);
+        spear.setSize(0,0);
+
         String[] fromFile = action.retrieveData()[0].split("Q");
         int row = 0;
         int col = 0;
-        Gdx.app.log("-----------updateBoard size of MyBoard", String.valueOf(this.myBoard.size));
         for (String s : fromFile) {
-            // First Row (s) = row 8
+            Gdx.app.log("------------------------->>>>>>>in Update row: ", s);
             for (char c : s.toCharArray()) {
-                // Frist col C ) 0
+                Gdx.app.log("",String.valueOf(c));
                 if(c == 'X'){
                     Sprite sprite = this.myGrass.get(col + row * 8);
-                    Gdx.app.log(">>>>>>>in Update ", "Col: " + String.valueOf(col) + ", Row: " + String.valueOf(row));
+                    if (((Grass) sprite).isHit()){
+                        continue;
+                    }
+                    Gdx.app.log(">>>>>>>in Update ", "Col: " + String.valueOf(col) + ", Row: " + String.valueOf(row)+ ", Grass-Sprite index: "+ (col + row * 8) );
                     Sprite newSprite = ((Grass) sprite).gotHit();
                     if (newSprite == null) {
+                        Gdx.app.log(">>>>>>>in Update ", "newSprite == null");
                         continue;
                     }
                     this.myBoard.add(newSprite);
                 }
                 col++;
             }
+
             row++;
             col = 0;
         }
@@ -198,6 +214,7 @@ public class InGameState implements IState {
         int j = 0;
         int pos = -1;
         for (String s : fromFile) {
+            String alteredS = s;
             for (char c : s.toCharArray()) {
                 pos++;
                 // Grass underneath
@@ -216,6 +233,7 @@ public class InGameState implements IState {
                 if (c == 's' && formerRow.toCharArray()[j] == 's') {
                     if(formerLetter == 's') {
                         formerLetter = '.';
+                        alteredS = s.substring(0,j-1)+'.'+'.'+s.substring(j+1);
                         Texture tex = new Texture("sheep-liten.png");
                         Sprite sheep = new Sprite(tex, Math.round(rangeY * 2) - 2, Math.round(rangeY * 2) - 2);
                         sheep.setPosition((j - 1)  * rangeY + 1 + BattleSheep.WIDTH / 4, i * rangeY + 1 + BattleSheep.HEIGHT / 16);
@@ -232,11 +250,11 @@ public class InGameState implements IState {
             }
             j = 0;
             i--;
-            formerRow = s;
+            formerRow = alteredS;
         }
         Texture b = new Texture("bonde-liten.png");
-        Sprite bonde = new Sprite(b, b.getWidth() / 2, b.getHeight() / 2);
-        bonde.setPosition((float) (BattleSheep.WIDTH * 0.875), BattleSheep.HEIGHT / 16);
+        Sprite bonde = new Sprite(b, b.getWidth() , b.getHeight() );
+        bonde.setPosition((float) (BattleSheep.WIDTH * 0.7), BattleSheep.HEIGHT / 25);
         this.myBoard.add(bonde);
     }
 
@@ -294,8 +312,7 @@ public class InGameState implements IState {
             j = 0;
             i--;
         }
-        Texture b = new Texture("bonde-liten.png");
-        Sprite bonde = new Sprite(b,b.getWidth()/2,b.getHeight()/2);
+        Sprite bonde = new Sprite(player,player.getWidth()/2,player.getHeight()/2);
         bonde.setPosition(BattleSheep.WIDTH / 8, (float) (BattleSheep.HEIGHT * 0.875));
         this.opponentBoard.add(bonde);
     }
@@ -330,6 +347,9 @@ public class InGameState implements IState {
             Gdx.app.log("------> MakeMove()", "Its not your turn!");
             return;
         }else {
+            //change to throw sprite
+            myBoard.get(myBoard.size-1).setTexture(playerThrow);
+
             float[] spritePosition = new float[2];
             float spriteX;
             float spriteY;
@@ -342,6 +362,8 @@ public class InGameState implements IState {
                 spriteCoordinates = parsePosition(spritePosition);
                 if (col == spriteCoordinates[0] && row == spriteCoordinates[1]) {
                     if (c instanceof Grass) {
+                        //position spear in center of targeted grass-tile
+                        spear.setPosition(c.getX() + c.getWidth()/2 - 13, c.getY() - c.getHeight() - 10);
                         Sprite newSprite = ((Grass) c).gotHit();
                         if (newSprite == null) {
                             continue;
@@ -365,6 +387,14 @@ public class InGameState implements IState {
         if(gameFinished()){
             System.out.println("You won!");
         }
+        /*
+        float delta_x = spear.getX() - (float) (BattleSheep.WIDTH * 0.7);
+        float delta_y = spear.getY() - BattleSheep.HEIGHT/8;
+        float theta_radians = atan2(delta_y, delta_x);
+        Gdx.app.log("-------------------------------->", "angle: "+theta_radians*57);
+        Gdx.app.log("-------------------------------->", "rotate deg: "+((theta_radians*57) - 90));
+        */
+        spear.setSize(26,187);
 
     }
     //TODO: c == 'x' || c == 'b'

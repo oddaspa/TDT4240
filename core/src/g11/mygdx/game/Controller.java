@@ -19,14 +19,18 @@ public class Controller extends InputListener {
     public void update(float[] coordinates) {
         if(theModel.currentMode.equals("placeAnimalState")){
             theModel.parseInput(coordinates);
-            theView.render(theModel.serveData(), theModel.serveMessages());
-        }else{
+        }
+        else if (theModel.currentMode.equals("loadingState")){
+            theModel.parseInput(coordinates);
+        }
+        else{
             if(coordinates != this.previousCoordinates){
                 theModel.parseInput(coordinates);
-                theView.render(theModel.serveData(), theModel.serveMessages());
                 this.previousCoordinates = coordinates;
             }
         }
+        theModel.parseInput(coordinates);
+        theView.render(theModel.serveData(), theModel.serveMessages());
 
     }
 }

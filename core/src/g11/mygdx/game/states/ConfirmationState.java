@@ -19,7 +19,10 @@ public class ConfirmationState implements IState {
     private Sprite confirmationScreen;
     private Button yesButton;
     private Button noButton;
+
     private Button soundButton;
+    private static Texture soundTexture = new Texture("sound.png");
+    private static Texture soundOffTexture = new Texture("nosound.png");
     private Array<Sprite> sprites = new Array<Sprite>();
     private MenuState menu;
 
@@ -39,7 +42,6 @@ public class ConfirmationState implements IState {
         Texture noTexture = new Texture("no_button.png");
         this.noButton = new NoButton(new Sprite(noTexture), (confirmationScreen.getWidth() / 2) - (BattleSheep.WIDTH / 3), (float) (BattleSheep.HEIGHT / 4));
 
-        Texture soundTexture = new Texture("sound.png");
         Sprite soundSprite = new Sprite(soundTexture, BattleSheep.WIDTH / 8, BattleSheep.WIDTH / 8);
         this.soundButton = new HomeButton(soundSprite, (float) BattleSheep.WIDTH/2 - soundSprite.getWidth()/2, (float) BattleSheep.HEIGHT/10);
 
@@ -61,8 +63,11 @@ public class ConfirmationState implements IState {
             Gdx.app.log("confirmationstate----","sound pressed");
             if (menu.music.getVolume() == 0.6f){
                 menu.music.setVolume(0f);
+                soundButton.getButton().setTexture(soundOffTexture);
             }else{
                 menu.music.setVolume(0.6f);
+                soundButton.getButton().setTexture(soundTexture);
+
             }
         }
         return "confirmationState";
