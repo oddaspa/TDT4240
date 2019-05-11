@@ -19,11 +19,11 @@ public class Model {
     private String previousState;
     private String nextState;
     private PlayServices action;
-
+    private static Model instance = null;
 
     // MAKE ALL THE STATES
 
-    public Model(PlayServices actionResolver){
+    private Model(PlayServices actionResolver){
         this.action = actionResolver;
         this.menu = new MenuState(actionResolver);
         this.loading = new LoadingState();
@@ -33,6 +33,14 @@ public class Model {
         this.nextState = "";
         this.currentMode = "loadingState";
         this.confirmationState = new ConfirmationState(this.previousState, menu);
+    }
+
+    // Singleton constructor
+    public static Model getInstance(PlayServices action){
+        if(instance == null){
+            instance = new Model(action);
+        }
+        return instance;
     }
 
     public void parseInput(float[] data){

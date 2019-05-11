@@ -18,12 +18,23 @@ public class View extends Screen {
     private SpriteBatch sb;
     private Controller channel;
 
-    View(SpriteBatch batch) {
+    private static View instance = null;
+
+
+    private View(SpriteBatch batch) {
         super(batch);
         this.channel = null;
         this.sb = batch;
         this.currentScreen = 1;
 
+    }
+
+    // Singleton constructor
+    public static View getInstance(SpriteBatch batch){
+        if(instance == null){
+            instance = new View(batch);
+        }
+        return instance;
     }
 
 
