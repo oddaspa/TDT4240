@@ -18,12 +18,23 @@ public class View extends Screen {
     private SpriteBatch sb;
     private Controller channel;
 
+    private static View instance = null;
 
-    View(SpriteBatch batch) {
+
+    private View(SpriteBatch batch) {
         super(batch);
         this.channel = null;
         this.sb = batch;
         this.currentScreen = 1;
+
+    }
+
+    // Singleton constructor
+    public static View getInstance(SpriteBatch batch){
+        if(instance == null){
+            instance = new View(batch);
+        }
+        return instance;
     }
 
 
@@ -56,19 +67,28 @@ public class View extends Screen {
 
     @Override
     public void render(Array<Sprite> sprites, Array<String> msgs) {
+        cam.update();
         sb.begin();
         for (Sprite s : sprites) {
             sb.draw(s.getTexture(), Math.round(s.getX()),Math.round(s.getY()), s.getWidth(), s.getHeight());
         }
         BitmapFont font = new BitmapFont();
-        font.getData().setScale(2);
+        font.getData().setScale(4);
         font.setColor(Color.BLACK);
-        if(msgs != null){
-            font.draw(sb, msgs.get(0),BattleSheep.WIDTH/6, 720);
-            font.draw(sb, msgs.get(1),400, 790);
-            font.draw(sb, msgs.get(2),10, 40);
+        if(msgs != null && msgs.size > 2){
+            font.draw(sb, msgs.get(0),BattleSheep.WIDTH/3, (float) (BattleSheep.HEIGHT * 0.9));
+            font.draw(sb, msgs.get(1),BattleSheep.WIDTH /6, (float) (BattleSheep.HEIGHT * 0.6));
+            font.draw(sb, msgs.get(2),(float) ((BattleSheep.WIDTH * 0.35)), BattleSheep.HEIGHT / 16);
+
         }
+
         sb.end();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        // Calculate new Viewport
+        gamePort.update(width, height);
     }
 
     @Override

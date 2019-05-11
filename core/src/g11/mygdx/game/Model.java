@@ -5,12 +5,12 @@ import com.badlogic.gdx.utils.Array;
 
 import g11.mygdx.game.states.ConfirmationState;
 import g11.mygdx.game.states.InGameState;
-import g11.mygdx.game.states.MenuState;
 import g11.mygdx.game.states.LoadingState;
+import g11.mygdx.game.states.MenuState;
 import g11.mygdx.game.states.PlaceAnimalState;
 
 public class Model {
-    private String currentMode;
+    public String currentMode;
     private MenuState menu;
     private LoadingState loading;
     private PlaceAnimalState placeAnimal;
@@ -18,19 +18,29 @@ public class Model {
     private ConfirmationState confirmationState;
     private String previousState;
     private String nextState;
+    private PlayServices action;
+    private static Model instance = null;
+
     // MAKE ALL THE STATES
 
-    public Model(){
-        this.menu = new MenuState();
+    private Model(PlayServices actionResolver){
+        this.action = actionResolver;
+        this.menu = new MenuState(actionResolver);
         this.loading = new LoadingState();
-        this.placeAnimal = new PlaceAnimalState();
+        this.placeAnimal = new PlaceAnimalState(actionResolver);
         this.inGameState = null;
         this.previousState = "menuState";
         this.nextState = "";
         this.currentMode = "loadingState";
-        this.confirmationState = new ConfirmationState(this.previousState);
+        this.confirmationState = new ConfirmationState(this.previousState, menu);
+    }
 
-
+    // Singleton constructor
+    public static Model getInstance(PlayServices action){
+        if(instance == null){
+            instance = new Model(action);
+        }
+        return instance;
     }
 
     public void parseInput(float[] data){
@@ -57,7 +67,7 @@ public class Model {
         }
         if(currentMode.equals("inGameStatus")){
             if(this.inGameState == null){
-                this.inGameState = new InGameState();
+                this.inGameState = new InGameState(action);
             }
             nextState = this.inGameState.parseInput(data);
             if (!nextState.equals(this.previousState)) {
@@ -73,6 +83,7 @@ public class Model {
             if (!nextState.equals(this.previousState)) {
                 this.previousState = this.currentMode;
             }
+
             this.currentMode = nextState;
 
         }
@@ -81,6 +92,8 @@ public class Model {
             this.confirmationState.setPreviousState(this.previousState);
         }
     }
+
+
 
     public Array<Sprite> serveData(){
         if(this.currentMode.equals("menuState")){

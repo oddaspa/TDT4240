@@ -1,17 +1,21 @@
 package g11.mygdx.game;
 
+
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import de.golfgl.gdxgamesvcs.IGameServiceClient;
-import de.golfgl.gdxgamesvcs.IGameServiceListener;
-import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 
-public class BattleSheep extends ApplicationAdapter implements IGameServiceListener {
-	public static final int WIDTH = 480;
-	public static final int HEIGHT = 800;
+public class BattleSheep extends ApplicationAdapter {
+
+	public PlayServices localActionActionResolver;
+	public static int WIDTH = 480;
+	public static int HEIGHT = 800;
+
+	public static final int VIRTUAL_WIDTH = 480;
+	public static final int VIRTUAL_HEIGHT = 800;
 
 	public static final String TITLE = "BattleSheep";
 	private SpriteBatch batch;
@@ -20,38 +24,35 @@ public class BattleSheep extends ApplicationAdapter implements IGameServiceListe
 	private Model model;
 	public static float delta;
 
-    public IGameServiceClient gsClient;
 
 
-    @Override
+	public BattleSheep(PlayServices anActionResolver){
+		this.localActionActionResolver = anActionResolver;
+
+	}
+
+	@Override
 	public void create () {
-		while(!MyAssetManager.manager.update()){
-			System.out.println("Loading assets.. " + MyAssetManager.manager.getProgress() * 100 + "%");
+		if(Gdx.app.getType() == Application.ApplicationType.Android) {
+			// android specific code
+			BattleSheep.WIDTH = Gdx.graphics.getWidth();
+			BattleSheep.HEIGHT = Gdx.graphics.getHeight();
 		}
+
+		localActionActionResolver.signIn();
+
+		delta = Gdx.graphics.getDeltaTime();
+		Gdx.app.setLogLevel(Application.LOG_DEBUG);
+
 		batch = new SpriteBatch();
 		Gdx.gl.glClearColor(194/255f, 225/255f, 157/255f, 1);
 		delta = Gdx.graphics.getDeltaTime();
-		model = new Model();
-		view = new View(batch);
-		controller = new Controller(view, model);
+		model = model.getInstance(this.localActionActionResolver);
+		view = View.getInstance(batch);
+		controller = Controller.getInstance(view, model);
 		view.addObserver(controller);
 
 
-		// ..google play service client initialization..
-
-        if (gsClient == null)
-
-            // if no client is registered, register the required client
-            gsClient = new NoGameServiceClient();
-
-        // for getting callbacks from the client
-        gsClient.setListener(this);
-
-        // prints session status, true or false.
-        System.out.println(gsClient.isSessionActive());
-
-        // establish a connection to the game service without error messages or login screens
-        gsClient.resumeSession();
 	}
 
 	@Override
@@ -60,32 +61,13 @@ public class BattleSheep extends ApplicationAdapter implements IGameServiceListe
 		view.update(delta + 1);
 	}
 
-    @Override
-    public void pause() {
-        super.pause();
+	@Override
+	public void pause() {
+		super.pause();
+	}
 
-        gsClient.pauseSession();
-    }
-
-    @Override
-    public void resume() {
-        super.resume();
-
-        gsClient.resumeSession();
-    }
-
-    @Override
-    public void gsOnSessionActive() {
-
-    }
-
-    @Override
-    public void gsOnSessionInactive() {
-
-    }
-
-    @Override
-    public void gsShowErrorToUser(GsErrorType et, String msg, Throwable t) {
-
-    }
+	@Override
+	public void resume() {
+		super.resume();
+	}
 }

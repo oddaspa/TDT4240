@@ -7,14 +7,43 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 public class Controller extends InputListener {
     private View theView;
     private Model theModel;
+    private float[] previousCoordinates = new float[2];
+    private static Controller instance = null;
 
-    public Controller(View theView, Model theModel){
+    private Controller(View theView, Model theModel){
         this.theView = theView;
         this.theModel = theModel;
+        this.previousCoordinates[0] = -1;
+        this.previousCoordinates[1] = -1;
     }
 
+    // Singleton constructor
+    public static Controller getInstance(View theView, Model theModel){
+        if(instance == null){
+            instance = new Controller(theView, theModel);
+        }
+        return instance;
+    }
+
+
     public void update(float[] coordinates) {
-        theModel.parseInput(coordinates);
+        if(theModel.currentMode.equals("placeAnimalState")){
+            theModel.parseInput(coordinates);
+
+        }else if(theModel.currentMode.equals("loadingState")){
+            theModel.parseInput(coordinates);
+        }else if(theModel.currentMode.equals("menuState")){
+            theModel.parseInput(coordinates);
+
+        }
+        else{
+            if(coordinates != null){
+                if(Math.abs(coordinates[0] - this.previousCoordinates[0]) > 3 && Math.abs(coordinates[1] - this.previousCoordinates[1]) > 3){
+                    theModel.parseInput(coordinates);
+                    this.previousCoordinates = coordinates;
+                }
+            }
+        }
         theView.render(theModel.serveData(), theModel.serveMessages());
     }
 }
