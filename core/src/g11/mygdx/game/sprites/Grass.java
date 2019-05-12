@@ -5,6 +5,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import g11.mygdx.game.BattleSheep;
@@ -14,14 +16,16 @@ public class Grass extends Sprite{
     boolean hasAnimal;
     boolean isHit;
     Music animalHit;
+    Random rand;
 
 
     public Grass (){
         super();
+        rand = new Random();
         animalHit = Gdx.audio.newMusic(Gdx.files.internal("buttonClick.mp3"));
         animalHit.setVolume(0.5f);
-        int rand = ThreadLocalRandom.current().nextInt(1, 4 + 1);
-        Texture grass = new Texture("grass-" + rand + ".png");
+        int randInt = rand.nextInt(4) + 1;
+        Texture grass = new Texture("grass-" + randInt + ".png");
         this.setTexture(grass);
         float rangeY = (BattleSheep.HEIGHT/4)/8;
         this.setSize(Math.round(rangeY) - 2,Math.round(rangeY) - 2);

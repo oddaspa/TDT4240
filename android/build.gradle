@@ -17,11 +17,12 @@ android {
         exclude 'META-INF/robovm/ios/robovm.xml'
     }
     defaultConfig {
-        applicationId "battlesheep.progark"
+        applicationId "battlesheep2.progark"
         minSdkVersion 15
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -139,4 +140,5 @@ idea {
     }
 }
 dependencies {
+
 }

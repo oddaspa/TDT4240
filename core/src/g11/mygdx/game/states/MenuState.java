@@ -9,10 +9,9 @@ import com.badlogic.gdx.utils.Array;
 import g11.mygdx.game.BattleSheep;
 import g11.mygdx.game.PlayServices;
 import g11.mygdx.game.modules.Button;
-import g11.mygdx.game.modules.HomeButton;
-import g11.mygdx.game.modules.SignInButton;
+import g11.mygdx.game.modules.StandardButton;
 
-    public class MenuState implements IState {
+public class MenuState implements IState {
         // NEEDS TO CONTAIN THE DATA
         private Array<Sprite> menuSprites;
         private Button signIn;
@@ -34,7 +33,7 @@ import g11.mygdx.game.modules.SignInButton;
         public MenuState(PlayServices actionResolver){
             this.action = actionResolver;
             this.menuSprites = new Array<Sprite>();
-            this.formerData = new float[2];
+            this.formerData = null;
             loadData();
             music.setLooping(true);
             music.setVolume(0.6f);
@@ -53,7 +52,8 @@ import g11.mygdx.game.modules.SignInButton;
                 }
             }
             if (data == null) {return "menuState";}
-            if(data == formerData){
+            if(formerData!=null && Math.abs(data[0] - this.formerData[0]) < 5 && Math.abs(data[1] - this.formerData[1]) < 5){
+                Gdx.app.log("-___----__","formerData = input");
                 return "menuState";
             }
             formerData = data;
@@ -79,12 +79,10 @@ import g11.mygdx.game.modules.SignInButton;
                 return "menuState";
             }
             if (this.quickGame.isClicked(data[0], data[1])){
-                if (action.isSignedIn()) {
                     action.onQuickMatchClicked();
-                    return "placeAnimalState";
-                }else {
-                    Gdx.app.log("------> MenuState", "tried to play while signed out");
-                }
+                    if (action.isSignedIn()){
+                        return "placeAnimalState";
+                    }
             }
 
             return "menuState";
@@ -121,7 +119,7 @@ import g11.mygdx.game.modules.SignInButton;
             Texture quickTex = new Texture("quick_game.png");
             Sprite quickGameButton = new Sprite(quickTex);
             quickGameButton.setSize(2 * BattleSheep.WIDTH / 3, BattleSheep.HEIGHT / 6);
-            this.quickGame = new SignInButton(quickGameButton,BattleSheep.WIDTH/2 - (quickGameButton.getWidth()/2),(float) (BattleSheep.HEIGHT *2 / 8));
+            this.quickGame = new StandardButton(quickGameButton,BattleSheep.WIDTH/2 - (quickGameButton.getWidth()/2),(float) (BattleSheep.HEIGHT *2 / 8));
 
             this.menuSprites.add(background);
             this.menuSprites.add(quickGameButton);
@@ -129,15 +127,15 @@ import g11.mygdx.game.modules.SignInButton;
             // GPGS STUFF
             signInButton = new Sprite(new Texture("login.png"));
             signInButton.setSize(BattleSheep.WIDTH / 4, BattleSheep.WIDTH / 8);
-            this.signIn = new SignInButton(signInButton,BattleSheep.WIDTH - BattleSheep.WIDTH/15 - signInButton.getWidth(),BattleSheep.HEIGHT - signInButton.getHeight()- 50);
+            this.signIn = new StandardButton(signInButton,BattleSheep.WIDTH - BattleSheep.WIDTH/15 - signInButton.getWidth(),BattleSheep.HEIGHT - signInButton.getHeight()- 50);
 
             signOutButton = new Sprite(new Texture("logout.png"));
             signOutButton.setSize(BattleSheep.WIDTH / 4, BattleSheep.WIDTH / 8);
-            this.signOut = new SignInButton(signOutButton,BattleSheep.WIDTH - BattleSheep.WIDTH/15 - signOutButton.getWidth() ,BattleSheep.HEIGHT - signOutButton.getHeight()- 50);
+            this.signOut = new StandardButton(signOutButton,BattleSheep.WIDTH - BattleSheep.WIDTH/15 - signOutButton.getWidth() ,BattleSheep.HEIGHT - signOutButton.getHeight()- 50);
 
 
             Sprite soundSprite = new Sprite(soundTexture, BattleSheep.WIDTH / 8, BattleSheep.WIDTH / 8);
-            this.soundButton = new HomeButton(soundSprite, (float) BattleSheep.WIDTH/15, BattleSheep.HEIGHT - soundSprite.getHeight()- 50);
+            this.soundButton = new StandardButton(soundSprite, (float) BattleSheep.WIDTH/15, BattleSheep.HEIGHT - soundSprite.getHeight()- 50);
 
 
             this.menuSprites.add(signOutButton);

@@ -6,10 +6,9 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.utils.Array;
 
 import g11.mygdx.game.BattleSheep;
-import g11.mygdx.game.Model;
 import g11.mygdx.game.modules.Button;
-import g11.mygdx.game.modules.HomeButton;
 import g11.mygdx.game.modules.NoButton;
+import g11.mygdx.game.modules.StandardButton;
 import g11.mygdx.game.modules.YesButton;
 
 public class ConfirmationState implements IState {
@@ -43,7 +42,7 @@ public class ConfirmationState implements IState {
         this.noButton = new NoButton(new Sprite(noTexture), (confirmationScreen.getWidth() / 2) - (BattleSheep.WIDTH / 3), (float) (BattleSheep.HEIGHT / 4));
 
         Sprite soundSprite = new Sprite(soundTexture, BattleSheep.WIDTH / 8, BattleSheep.WIDTH / 8);
-        this.soundButton = new HomeButton(soundSprite, (float) BattleSheep.WIDTH/2 - soundSprite.getWidth()/2, (float) BattleSheep.HEIGHT/10);
+        this.soundButton = new StandardButton(soundSprite, (float) BattleSheep.WIDTH/2 - soundSprite.getWidth()/2, (float) BattleSheep.HEIGHT/10);
 
         this.sprites.add(confirmationScreen);
         this.sprites.add(yesButton.getButton());
@@ -68,7 +67,6 @@ public class ConfirmationState implements IState {
             }else{
                 menu.music.setVolume(0.6f);
                 soundButton.getButton().setTexture(soundTexture);
-
             }
         }
         return "confirmationState";
@@ -76,6 +74,12 @@ public class ConfirmationState implements IState {
 
     @Override
     public String parseInput(float[] data) {
+        if (menu.music.getVolume() == 0.6f){
+            soundButton.getButton().setTexture(soundTexture);
+        }else{
+            soundButton.getButton().setTexture(soundOffTexture);
+        }
+
         if (data == null) {
             return "confirmationState";
         } else {

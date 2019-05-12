@@ -7,12 +7,10 @@ import com.badlogic.gdx.utils.Array;
 
 import g11.mygdx.game.BattleSheep;
 import g11.mygdx.game.PlayServices;
-import g11.mygdx.game.modules.HomeButton;
+import g11.mygdx.game.modules.StandardButton;
 import g11.mygdx.game.sprites.Chicken;
 import g11.mygdx.game.sprites.Grass;
 import g11.mygdx.game.sprites.Sheep;
-
-import static com.badlogic.gdx.math.MathUtils.atan2;
 
 public class InGameState implements IState {
     private Array<Sprite> opponentBoard;
@@ -20,7 +18,7 @@ public class InGameState implements IState {
     private Array<Sprite> allSprites;
     private Array<String> inGameMessages;
     private Array<Sprite> grassTiles;
-    private HomeButton homeButton;
+    private StandardButton homeButton;
     private double col = 0;
     private double row = 0;
     private float LEFTBORDER = 1 + BattleSheep.WIDTH / 10;
@@ -55,7 +53,7 @@ public class InGameState implements IState {
         this.formerData = new float[2];
         Texture homeButtonTexture = new Texture("home.png");
         Sprite homeButtonSprite = new Sprite(homeButtonTexture, BattleSheep.WIDTH / 10, BattleSheep.WIDTH / 10);
-        this.homeButton = new HomeButton(homeButtonSprite, (float) BattleSheep.WIDTH / 48, (float) BattleSheep.HEIGHT - BattleSheep.HEIGHT / 80 - homeButtonSprite.getHeight());
+        this.homeButton = new StandardButton(homeButtonSprite, (float) BattleSheep.WIDTH / 48, (float) BattleSheep.HEIGHT - BattleSheep.HEIGHT / 80 - homeButtonSprite.getHeight());
         this.spear = new Sprite(new Texture("spear.png"),0,0);
         spear.setPosition((float) (BattleSheep.WIDTH * 0.7),BattleSheep.HEIGHT/8);
     }
@@ -64,9 +62,17 @@ public class InGameState implements IState {
     @Override
     public String parseInput(float[] data) {
         if(data == formerData){
+            if (action.getRematchStatus()){
+                return "placeAnimalState";
+            }
             return "inGameStatus";
         }
-        if (data == null) {return "inGameStatus";}
+        if (data == null) {
+            if (action.getRematchStatus()){
+                return "placeAnimalState";
+            }
+            return "inGameStatus";
+        }
         else if (this.homeButton.isClicked(data[0], data[1])) {
             return "confirmationState";
         }
@@ -415,14 +421,14 @@ public class InGameState implements IState {
         if (youWon){
             this.inGameMessages.set(1,"Congratz, You Won!");
             Gdx.app.log("xxxxxxxxxxxxxxxx GameFinished", "Congratz! You Won!");
-            action.onFinishClicked();
+            action.askForRematch();
             return true;
 
         }
         if (youLost){
             this.inGameMessages.set(1,"Better Luck Next Time, You Lost!");
             Gdx.app.log("xxxxxxxxxxxxxxxx GameFinished", "Better Luck Next Time! You Lost!");
-            action.onFinishClicked();
+            action.askForRematch();
             return true;
 
         }
